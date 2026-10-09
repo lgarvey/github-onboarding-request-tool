@@ -21,6 +21,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "waffle",
+    "authbroker_client",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -30,6 +32,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -56,6 +59,27 @@ ASGI_APPLICATION = "config.asgi.application"
 
 DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL"))}
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Waffle reads switches straight from the database. With the default per-process cache,
+# `manage.py waffle_switch` would not reach an already-running server.
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "waffle": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
+}
+WAFFLE_CACHE_NAME = "waffle"
+
+AUTH_USER_MODEL = "users.User"
+AUTHENTICATION_BACKENDS = [
+    "authbroker_client.backends.AuthbrokerBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
+
+# Staff SSO. Sign-in goes through SSO unless the DISABLE_SSO waffle switch is on.
+AUTHBROKER_URL = env("AUTHBROKER_URL")
+AUTHBROKER_CLIENT_ID = env("AUTHBROKER_CLIENT_ID")
+AUTHBROKER_CLIENT_SECRET = env("AUTHBROKER_CLIENT_SECRET")
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

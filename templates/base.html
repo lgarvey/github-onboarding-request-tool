@@ -20,7 +20,11 @@
             {% block nav_links %}{% endblock %}
           </ul>
           {% if user.is_authenticated %}
-            <span class="navbar-text">{{ user.email }}</span>
+            <span class="navbar-text me-3">{{ user.email|default:user.email_user_id }}</span>
+            <form method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-outline-light">Log out</button>
+            </form>
           {% endif %}
         </div>
       </div>
