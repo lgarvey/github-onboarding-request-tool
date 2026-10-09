@@ -1,0 +1,8 @@
+---
+# The top-level key does not match the directory name.
+legacy-org:
+  slug: legacy-org
+  repositories:
+    old-site:
+      name: old-site
+      archived: false

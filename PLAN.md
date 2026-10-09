@@ -73,17 +73,22 @@ terraform-github/terraform/{organisation-name}/
 ```
 
 - **Organisations** are the top-level directories under `terraform-github/terraform/`.
-- **Repositories** are read from `repositories/config.yaml`:
+- **Repositories** are read from `repositories/config.yaml`. The top-level key is the organisation, mirroring the org directory name:
 
 ```yaml
-{repo-name}:
-  name: {repo-name}
-  archived: true|false
-  team_permissions:
-    {team-name}: pull|triage|push|maintain|admin
-  user_permissions:
-    {github-username}: pull|triage|push|maintain|admin
-  # ...other fields exist; ignore for POC but MUST be preserved conceptually for later PR generation
+{organisation-name}:
+  slug: {organisation-name}
+  repositories:
+    {repo-name}:
+      name: {repo-name}
+      description: string|null
+      visibility: public|private|internal
+      archived: true|false
+      team_permissions:
+        {team-slug}: pull|triage|push|maintain|admin
+      user_permissions:             # may be null
+        {github-username}: pull|triage|push|maintain|admin
+      # ...other fields exist; ignore for POC but MUST be preserved conceptually for later PR generation
 ```
 
 - **Teams** are read from `teams/config.yaml`:
@@ -92,15 +97,20 @@ terraform-github/terraform/{organisation-name}/
 {organisation-name}:            # mirrors the org directory name
   # ...
   teams:
-    {team-name}:
+    {team-slug}:
       name: {team-name}
-      slug: {team-name-slugified}
+      slug: {team-slug}
+      description: string|null
+      privacy: closed|secret
+      parent_team_id: integer|null   # GitHub's numeric team ID, not a slug
       members:
-        {github-username}: member|admin
+        {github-username}: member|maintainer
       # ...other fields exist; ignore for POC
 ```
 
-**Before implementing the enums, inspect the real files** in `./terraform-github` if they are present. Use the permission and role values those files actually contain. The values above come from the spec, and GitHub itself uses `member|maintainer` for team roles. Define each enum exactly once, as a Django `TextChoices`, and use it everywhere.
+The real repo is internal and is not available to this project. The source of truth for structure and values is the pair of schemas in `terraform-github/schemas/`. `terraform-github/terraform/org1/` is an empty sample org. Permission and role values are defined exactly once, as Django `TextChoices` in `catalogue/choices.py`, and used everywhere.
+
+Assumptions not confirmed by the schemas: keys in `team_permissions` are team slugs, a team's YAML key equals its slug, and each `config.yaml` has one top-level org key.
 
 Handle a missing or empty YAML file gracefully by treating it as an empty list rather than raising a 500.
 
@@ -201,10 +211,17 @@ This is a pure-Python read layer over the YAML that returns dataclasses. Views n
 - `list_organisations() -> list[str]`
 - `get_repositories(org) -> list[Repository]` (name, archived, team_permissions dict, user_permissions dict)
 - `get_repository(org, name) -> Repository | None`
-- `get_teams(org) -> list[Team]` (name, slug, description, parent, members dict)
+- `get_teams(org) -> list[Team]` (name, slug, description, privacy, parent_team_id, members dict)
 - `get_team(org, slug) -> Team | None`
 
 Keep it simple; no caching is needed for the POC. Tests run against `tests/fixtures/terraform-github/`, never the real checkout. Override the path in pytest settings.
+
+### `catalogue.services.github_teams`
+
+The YAML refers to a parent team by numeric GitHub ID but records no ID for each team, so IDs have to come from GitHub.
+
+- `get_team_ids(org) -> dict[str, int]` maps team slug to numeric ID. It is a **stub** returning stable fake IDs for the teams in the YAML. It will later be a GitHub GraphQL query using a token with access to every org.
+- `get_team_id(org, slug)` and `get_parent_team(org, team)` are built on it. Nothing else knows about IDs.
 
 ### `change_requests.services.diff`
 

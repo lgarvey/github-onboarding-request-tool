@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "waffle",
     "authbroker_client",
     "users",
+    "catalogue",
 ]
 
 MIDDLEWARE = [

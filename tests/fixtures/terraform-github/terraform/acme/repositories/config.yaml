@@ -1,0 +1,36 @@
+---
+acme:
+  slug: acme
+  repositories:
+    trade-api:
+      name: trade-api
+      description: Public API for trade data
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        platform-sre: admin
+        data-engineering: push
+      user_permissions:
+        jbloggs: maintain
+        old-contractor: pull
+    legacy-importer:
+      name: legacy-importer
+      description: null
+      visibility: private
+      archived: true
+      team_permissions:
+        platform-sre: admin
+      user_permissions: null
+    design-docs:
+      name: design-docs
+      description: Architecture decision records
+      visibility: internal
+    .github:
+      name: .github
+      visibility: public
+      archived: false
+      team_permissions:
+        platform-sre: maintain
+      user_permissions: {}

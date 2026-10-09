@@ -1,0 +1,44 @@
+---
+acme:
+  slug: acme
+  display_name: Acme
+  billing_email: billing@acme.example
+  description: Fixture organisation
+  admin_logins:
+    - org-owner
+  teams:
+    platform-sre:
+      name: Platform SRE
+      slug: platform-sre
+      description: Runs the platform
+      privacy: closed
+      parent_team_id: null
+      members:
+        jbloggs: maintainer
+        asmith: member
+      organisation_role_names:
+        - all_repo_admin
+    platform-sre-oncall:
+      name: Platform SRE On-call
+      slug: platform-sre-oncall
+      description: null
+      privacy: closed
+      # The stub ID of platform-sre; see catalogue.services.github_teams.
+      parent_team_id: 3152637
+      members:
+        asmith: member
+    data-engineering:
+      name: Data Engineering
+      slug: data-engineering
+      description: Pipelines and warehouses
+      privacy: closed
+      # Not the ID of any team in this file.
+      parent_team_id: 42
+      members:
+        mjones: maintainer
+        kpatel: member
+        jbloggs: member
+    contractors:
+      name: Contractors
+      slug: contractors
+      privacy: secret
