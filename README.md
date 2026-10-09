@@ -31,6 +31,15 @@ Users are keyed on the SSO `email_user_id`. With SSO on, `/admin/` is reached th
 needs `is_staff`, so the first admin has to be created with `createsuperuser` using their SSO
 `email_user_id`.
 
+## Portfolios
+
+Every request is tied to an approving portfolio. Portfolios and their approvers are managed in
+the admin at `/admin/portfolios/`. For a demo, load some example ones (safe to re-run):
+
+```bash
+docker compose exec web python manage.py seed_portfolios
+```
+
 ## Tests and linting
 
 Python 3.13 is only needed inside the container, so everything can be run through compose:

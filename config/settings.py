@@ -24,6 +24,9 @@ INSTALLED_APPS = [
     "authbroker_client",
     "users",
     "catalogue",
+    "portfolios",
+    "change_requests",
+    "github_users",
 ]
 
 MIDDLEWARE = [
