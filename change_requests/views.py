@@ -1,9 +1,11 @@
+from dataclasses import dataclass
+
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from catalogue.choices import RepositoryPermission
+from catalogue.choices import RepositoryPermission, TeamRole
 from catalogue.services import terraform_config
 from change_requests.choices import Action, PrincipalType, Status, TargetType
 from change_requests.forms import PortfolioForm, build_principal_formset
@@ -40,6 +42,78 @@ def _user_choices():
     return [(username, username) for username in list_usernames()]
 
 
+@dataclass(frozen=True)
+class Section:
+    """One group of dynamic rows on an edit form."""
+
+    context_name: str
+    prefix: str
+    principal_type: PrincipalType
+    current: dict[str, str]
+    principal_choices: list
+    permission_choices: list
+
+
+def _edit_access(request, *, org, target_type, target_name, sections, template, context):
+    """Show and process a form that changes who has access to an existing repository or team."""
+    draft = _get_draft(
+        request,
+        organisation=org,
+        target_type=target_type,
+        target_name=target_name,
+        action=Action.MODIFY,
+    )
+    draft_items = list(draft.items.all()) if draft else []
+    data = request.POST or None
+
+    formsets = []
+    for section in sections:
+        initial = section.current
+        if draft:
+            initial = apply_items(initial, draft_items, section.principal_type)
+        formset = build_principal_formset(
+            data,
+            prefix=section.prefix,
+            initial=initial,
+            principal_choices=section.principal_choices,
+            permission_choices=section.permission_choices,
+        )
+        formsets.append((section, formset))
+    portfolio_form = PortfolioForm(data, initial={"portfolio": draft and draft.portfolio_id})
+
+    errors = []
+    forms_valid = [
+        form.is_valid() for form in (*(formset for _, formset in formsets), portfolio_form)
+    ]
+    if request.method == "POST" and all(forms_valid):
+        # The diff is always against the YAML, not against what the form started with.
+        items = []
+        for section, formset in formsets:
+            items += diff_permissions(section.current, formset.desired(), section.principal_type)
+        if items:
+            change_request = save_draft(
+                requested_by=request.user,
+                organisation=org,
+                target_type=target_type,
+                target_name=target_name,
+                action=Action.MODIFY,
+                portfolio=portfolio_form.cleaned_data["portfolio"],
+                items=items,
+                draft=draft,
+            )
+            return redirect("change_request_confirm", change_request.pk)
+        errors.append(NO_CHANGES)
+
+    context = {
+        **context,
+        **{section.context_name: formset for section, formset in formsets},
+        "org": org,
+        "portfolio_form": portfolio_form,
+        "errors": errors,
+    }
+    return render(request, template, context)
+
+
 @require_http_methods(["GET", "POST"])
 def repository_edit(request, org, repo):
     _require_organisation(org)
@@ -50,73 +124,58 @@ def repository_edit(request, org, repo):
         messages.error(request, f"{repository.name} is archived and cannot be edited.")
         return redirect("organisation_detail", org)
 
-    draft = _get_draft(
+    return _edit_access(
         request,
-        organisation=org,
+        org=org,
         target_type=TargetType.REPOSITORY,
         target_name=repository.name,
-        action=Action.MODIFY,
-    )
-    team_initial = repository.team_permissions
-    user_initial = repository.user_permissions
-    if draft:
-        items = list(draft.items.all())
-        team_initial = apply_items(team_initial, items, PrincipalType.TEAM)
-        user_initial = apply_items(user_initial, items, PrincipalType.USER)
-
-    data = request.POST or None
-    team_formset = build_principal_formset(
-        data,
-        prefix="teams",
-        initial=team_initial,
-        principal_choices=_team_choices(org),
-        permission_choices=RepositoryPermission.choices,
-    )
-    user_formset = build_principal_formset(
-        data,
-        prefix="users",
-        initial=user_initial,
-        principal_choices=_user_choices(),
-        permission_choices=RepositoryPermission.choices,
-    )
-    portfolio_form = PortfolioForm(
-        data, initial={"portfolio": draft.portfolio_id if draft else None}
+        sections=[
+            Section(
+                context_name="team_formset",
+                prefix="teams",
+                principal_type=PrincipalType.TEAM,
+                current=repository.team_permissions,
+                principal_choices=_team_choices(org),
+                permission_choices=RepositoryPermission.choices,
+            ),
+            Section(
+                context_name="user_formset",
+                prefix="users",
+                principal_type=PrincipalType.USER,
+                current=repository.user_permissions,
+                principal_choices=_user_choices(),
+                permission_choices=RepositoryPermission.choices,
+            ),
+        ],
+        template="change_requests/repository_edit.html",
+        context={"repository": repository},
     )
 
-    errors = []
-    forms_valid = [form.is_valid() for form in (team_formset, user_formset, portfolio_form)]
-    if request.method == "POST" and all(forms_valid):
-        # The diff is always against the YAML, not against what the form started with.
-        items = diff_permissions(
-            repository.team_permissions, team_formset.desired(), PrincipalType.TEAM
-        ) + diff_permissions(
-            repository.user_permissions, user_formset.desired(), PrincipalType.USER
-        )
-        if items:
-            change_request = save_draft(
-                requested_by=request.user,
-                organisation=org,
-                target_type=TargetType.REPOSITORY,
-                target_name=repository.name,
-                action=Action.MODIFY,
-                portfolio=portfolio_form.cleaned_data["portfolio"],
-                items=items,
-                draft=draft,
-            )
-            return redirect("change_request_confirm", change_request.pk)
-        errors.append(NO_CHANGES)
 
-    return render(
+@require_http_methods(["GET", "POST"])
+def team_edit(request, org, slug):
+    _require_organisation(org)
+    team = terraform_config.get_team(org, slug)
+    if team is None:
+        raise Http404("Unknown team")
+
+    return _edit_access(
         request,
-        "change_requests/repository_edit.html",
-        {
-            "org": org,
-            "repository": repository,
-            "team_formset": team_formset,
-            "user_formset": user_formset,
-            "portfolio_form": portfolio_form,
-            "errors": errors,
-        },
+        org=org,
+        target_type=TargetType.TEAM,
+        target_name=team.slug,
+        sections=[
+            Section(
+                context_name="member_formset",
+                prefix="members",
+                principal_type=PrincipalType.USER,
+                current=team.members,
+                principal_choices=_user_choices(),
+                permission_choices=TeamRole.choices,
+            ),
+        ],
+        template="change_requests/team_edit.html",
+        context={"team": team},
     )
 
 

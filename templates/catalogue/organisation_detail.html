@@ -62,7 +62,7 @@
                     <span class="text-muted ms-1">{{ row.team.members|length }} member{{ row.team.members|length|pluralize }}</span>
                     {% if row.parent %}<span class="text-muted ms-1">· part of {{ row.parent.name }}</span>{% endif %}
                   </span>
-                  <a class="btn btn-sm btn-outline-primary" href="/orgs/{{ org|urlencode:'' }}/teams/{{ row.team.slug|urlencode:'' }}/edit/">Edit members</a>
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'team_edit' org row.team.slug %}">Edit members</a>
                 </li>
               {% endfor %}
             </ul>

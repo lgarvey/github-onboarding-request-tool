@@ -38,8 +38,9 @@ class ChangeRequest(models.Model):
 
     def get_edit_url(self):
         """The form that produced this request, pre-populated from it. None if there isn't one."""
-        if self.action == Action.MODIFY and self.target_type == TargetType.REPOSITORY:
-            url = reverse("repository_edit", args=[self.organisation, self.target_name])
+        if self.action == Action.MODIFY:
+            name = "team_edit" if self.target_type == TargetType.TEAM else "repository_edit"
+            url = reverse(name, args=[self.organisation, self.target_name])
             return f"{url}?draft={self.pk}"
         return None
 
