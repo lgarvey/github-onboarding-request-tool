@@ -110,7 +110,7 @@ terraform-github/terraform/{organisation-name}/
 
 The real repo is internal and is not available to this project. The source of truth for structure and values is the pair of schemas in `terraform-github/schemas/`. `terraform-github/terraform/org1/` is an empty sample org. Permission and role values are defined exactly once, as Django `TextChoices` in `catalogue/choices.py`, and used everywhere.
 
-Assumptions not confirmed by the schemas: keys in `team_permissions` are team slugs, a team's YAML key equals its slug, and each `config.yaml` has one top-level org key.
+Confirmed by the SRE team rather than the schemas: keys in `team_permissions` are team slugs, a team's YAML key is its slug, and each `config.yaml` has one top-level org key.
 
 Handle a missing or empty YAML file gracefully by treating it as an empty list rather than raising a 500.
 

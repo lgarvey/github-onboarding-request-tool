@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Organisations{% endblock %}
+
+{% block content %}
+  <h1 class="h3 mb-3">Organisations</h1>
+  {% if organisations %}
+    <div class="list-group">
+      {% for org in organisations %}
+        <a class="list-group-item list-group-item-action" href="{% url 'organisation_detail' org %}">{{ org }}</a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No organisations were found in the terraform-github config.</p>
+  {% endif %}
+{% endblock %}

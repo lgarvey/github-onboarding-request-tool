@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}{{ org }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'organisation_list' %}">Organisations</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ org }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-3">{{ org }}</h1>
+
+  <div class="accordion" id="org-sections">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#repositories" aria-expanded="false" aria-controls="repositories">
+          Repositories <span class="badge text-bg-secondary ms-2">{{ repositories|length }}</span>
+        </button>
+      </h2>
+      <div id="repositories" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          {% if repositories %}
+            <ul class="list-group mb-3">
+              {% for repo in repositories %}
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+                  <span class="me-auto">
+                    <span class="fw-semibold">{{ repo.name }}</span>
+                    {% if repo.archived %}<span class="badge text-bg-warning ms-1">Archived</span>{% endif %}
+                  </span>
+                  {% if not repo.archived %}
+                    <a class="btn btn-sm btn-outline-primary" href="/orgs/{{ org|urlencode:'' }}/repos/{{ repo.name|urlencode:'' }}/edit/">Edit collaborators</a>
+                    <a class="btn btn-sm btn-outline-danger" href="/orgs/{{ org|urlencode:'' }}/repos/{{ repo.name|urlencode:'' }}/archive/">Archive</a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">This organisation has no repositories.</p>
+          {% endif %}
+          <a class="btn btn-primary" href="/orgs/{{ org|urlencode:'' }}/repos/new/">Add repository</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#teams" aria-expanded="false" aria-controls="teams">
+          Teams <span class="badge text-bg-secondary ms-2">{{ team_rows|length }}</span>
+        </button>
+      </h2>
+      <div id="teams" class="accordion-collapse collapse">
+        <div class="accordion-body">
+          {% if team_rows %}
+            <ul class="list-group mb-3">
+              {% for row in team_rows %}
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+                  <span class="me-auto">
+                    <span class="fw-semibold">{{ row.team.name }}</span>
+                    <span class="text-muted ms-1">{{ row.team.members|length }} member{{ row.team.members|length|pluralize }}</span>
+                    {% if row.parent %}<span class="text-muted ms-1">· part of {{ row.parent.name }}</span>{% endif %}
+                  </span>
+                  <a class="btn btn-sm btn-outline-primary" href="/orgs/{{ org|urlencode:'' }}/teams/{{ row.team.slug|urlencode:'' }}/edit/">Edit members</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">This organisation has no teams.</p>
+          {% endif %}
+          <a class="btn btn-primary" href="/orgs/{{ org|urlencode:'' }}/teams/new/">Add team</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
