@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
+from django.utils import timezone
 
 from change_requests.choices import Action, Operation, PrincipalType, Status, TargetType
 
@@ -28,6 +30,18 @@ class ChangeRequest(models.Model):
 
     def __str__(self):
         return f"{self.get_action_display()} {self.target_type} {self.target_name}"
+
+    def submit(self):
+        self.status = Status.SUBMITTED
+        self.submitted_at = timezone.now()
+        self.save(update_fields=["status", "submitted_at"])
+
+    def get_edit_url(self):
+        """The form that produced this request, pre-populated from it. None if there isn't one."""
+        if self.action == Action.MODIFY and self.target_type == TargetType.REPOSITORY:
+            url = reverse("repository_edit", args=[self.organisation, self.target_name])
+            return f"{url}?draft={self.pk}"
+        return None
 
     def heading(self):
         target = f"{self.target_name} (org: {self.organisation})"

@@ -1,0 +1,6 @@
+<div class="mb-4">
+  <label class="form-label h5" for="{{ form.portfolio.id_for_label }}">Portfolio</label>
+  {{ form.portfolio }}
+  <div class="form-text">{{ form.portfolio.help_text }}</div>
+  {% for error in form.portfolio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+</div>

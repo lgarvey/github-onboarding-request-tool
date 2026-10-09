@@ -1,0 +1,20 @@
+<fieldset class="mb-4" data-formset data-formset-prefix="{{ formset.prefix }}">
+  <legend class="h5">{{ title }}</legend>
+  {{ formset.management_form }}
+  {% for error in formset.non_form_errors %}
+    <div class="alert alert-danger py-2">{{ error }}</div>
+  {% endfor %}
+  <div class="row g-2 mb-1 text-muted small d-none d-sm-flex">
+    <div class="col-sm-6">{{ principal_label }}</div>
+    <div class="col-sm-4">{{ permission_label }}</div>
+  </div>
+  <div data-formset-rows>
+    {% for form in formset %}
+      {% include "change_requests/_formset_row.html" with form=form %}
+    {% endfor %}
+  </div>
+  <template data-formset-template>
+    {% include "change_requests/_formset_row.html" with form=formset.empty_form %}
+  </template>
+  <button type="button" class="btn btn-sm btn-outline-secondary" data-formset-add>{{ add_label }}</button>
+</fieldset>

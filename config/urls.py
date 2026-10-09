@@ -14,4 +14,5 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(template_name="users/logged_out.html"), name="logout"),
     path("healthcheck/", views.healthcheck, name="healthcheck"),
     path("", include("catalogue.urls")),
+    path("", include("change_requests.urls")),
 ]

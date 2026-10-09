@@ -1,0 +1,18 @@
+<div class="row g-2 align-items-start mb-2" data-formset-row>
+  <div class="col-sm-6">
+    {{ form.principal }}
+    {% for error in form.principal.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-sm-4">
+    {{ form.permission }}
+    {% for error in form.permission.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+  </div>
+  <div class="col-sm-2">
+    {# Without JavaScript the checkbox is the way to remove a row; formset.js swaps it for the button. #}
+    <div class="form-check pt-2" data-formset-delete-fallback>
+      {{ form.DELETE }}
+      <label class="form-check-label" for="{{ form.DELETE.id_for_label }}">Remove</label>
+    </div>
+    <button type="button" class="btn btn-outline-danger d-none" data-formset-delete>Delete</button>
+  </div>
+</div>

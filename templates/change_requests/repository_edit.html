@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit collaborators: {{ repository.name }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'organisation_list' %}">Organisations</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'organisation_detail' org %}">{{ org }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ repository.name }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-3">Edit collaborators: {{ repository.name }}</h1>
+
+  {% for error in errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endfor %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "change_requests/_formset.html" with formset=team_formset title="Teams" principal_label="Team" permission_label="Permission" add_label="Add team" %}
+    {% include "change_requests/_formset.html" with formset=user_formset title="Users" principal_label="GitHub username" permission_label="Permission" add_label="Add user" %}
+    {% include "change_requests/_portfolio_field.html" with form=portfolio_form %}
+    <button type="submit" class="btn btn-primary">Review request</button>
+    <a class="btn btn-link" href="{% url 'organisation_detail' org %}">Cancel</a>
+  </form>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/formset.js' %}"></script>
+{% endblock %}

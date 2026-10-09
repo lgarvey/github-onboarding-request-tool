@@ -30,7 +30,7 @@
                     {% if repo.archived %}<span class="badge text-bg-warning ms-1">Archived</span>{% endif %}
                   </span>
                   {% if not repo.archived %}
-                    <a class="btn btn-sm btn-outline-primary" href="/orgs/{{ org|urlencode:'' }}/repos/{{ repo.name|urlencode:'' }}/edit/">Edit collaborators</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'repository_edit' org repo.name %}">Edit collaborators</a>
                     <a class="btn btn-sm btn-outline-danger" href="/orgs/{{ org|urlencode:'' }}/repos/{{ repo.name|urlencode:'' }}/archive/">Archive</a>
                   {% endif %}
                 </li>

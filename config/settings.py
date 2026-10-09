@@ -2,6 +2,7 @@ from pathlib import Path
 
 import dj_database_url
 import environ
+from django.contrib.messages import constants as message_constants
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,6 +92,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+# Bootstrap calls the error style "danger".
+MESSAGE_TAGS = {message_constants.ERROR: "danger"}
 
 LANGUAGE_CODE = "en-gb"
 TIME_ZONE = "Europe/London"
