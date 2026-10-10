@@ -16,7 +16,7 @@ This project is a Django POC for requesting GitHub repo/team access changes, bac
 - Views never read YAML directly. Go through `catalogue.services.terraform_config`.
 - Permission/role values are defined once as `TextChoices` and reused everywhere.
 - All settings come from env vars via `django-environ`. No secrets in code.
-- The `terraform-github/` checkout is **read-only** and gitignored. The app never writes to it (yet).
+- The config tree is read from `TERRAFORM_GITHUB_PATH`. The default is `terraform-github-sample/`, a checked-in stand-in holding the schemas and an empty sample org. A real checkout at `terraform-github/` is gitignored. Either way it is **read-only**: the app never writes to it (yet).
 - Tests use `tests/fixtures/terraform-github/`, never the real checkout.
 
 ## Commands
@@ -28,5 +28,5 @@ docker compose exec web python manage.py waffle_switch DISABLE_SSO on --create  
 docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py seed_portfolios
 docker compose exec web pytest
-poetry run ruff check . && poetry run ruff format .
+docker compose exec web sh -c "ruff check . && ruff format ."
 ```

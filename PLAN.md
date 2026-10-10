@@ -51,7 +51,8 @@ project-root/
   static/                 # vendored bootstrap, js/, css/
   tests/
     fixtures/terraform-github/terraform/...   # fake config tree used by tests
-  terraform-github/       # real checkout (gitignored), mounted read-only
+  terraform-github-sample/  # schemas + empty sample org, checked in; the default config path
+  terraform-github/       # a real checkout, if you have one (gitignored); set TERRAFORM_GITHUB_PATH
   docker-compose.yml
   Dockerfile
   pyproject.toml
@@ -64,7 +65,7 @@ Do not name an app `requests` because it collides with the `requests` library.
 
 ## Source data: `terraform-github`
 
-The location comes from the env var `TERRAFORM_GITHUB_PATH`, defaulting to `./terraform-github`. The structure is:
+The location comes from the env var `TERRAFORM_GITHUB_PATH`, defaulting to the checked-in sample, `./terraform-github-sample`. The structure is:
 
 ```
 terraform-github/terraform/{organisation-name}/
@@ -108,7 +109,7 @@ terraform-github/terraform/{organisation-name}/
       # ...other fields exist; ignore for POC
 ```
 
-The real repo is internal and is not available to this project. The source of truth for structure and values is the pair of schemas in `terraform-github/schemas/`. `terraform-github/terraform/org1/` is an empty sample org. Permission and role values are defined exactly once, as Django `TextChoices` in `catalogue/choices.py`, and used everywhere.
+The real repo is internal and is not available to this project. The source of truth for structure and values is the pair of schemas in `terraform-github-sample/schemas/`. `terraform-github-sample/terraform/org1/` is an empty sample org. Permission and role values are defined exactly once, as Django `TextChoices` in `catalogue/choices.py`, and used everywhere.
 
 Confirmed by the SRE team rather than the schemas: keys in `team_permissions` are team slugs, a team's YAML key is its slug, and each `config.yaml` has one top-level org key.
 
@@ -299,7 +300,7 @@ All pages share a simple Bootstrap layout with a navbar containing: app name, Or
 - **Dockerfile**: `python:3.13-slim`, installs Poetry, `poetry install`, and runs `runserver 0.0.0.0:8000` for dev.
 - **docker-compose.yml**:
   - `db`: postgres (current stable), with a named volume and healthcheck.
-  - `web`: builds the Dockerfile, mounts the project for live reload, mounts `./terraform-github` **read-only**, depends on `db` being healthy, and runs migrations on start.
+  - `web`: builds the Dockerfile, mounts the project for live reload, mounts the directory named by `TERRAFORM_GITHUB_PATH` **read-only**, depends on `db` being healthy, and runs migrations on start.
 - **`.env.example`** lists every env var with safe local defaults (`DEBUG=True`, `DATABASE_URL`, `SECRET_KEY`, `TERRAFORM_GITHUB_PATH`, and `AUTHBROKER_*` placeholders).
 - **Settings** live in a single `config/settings.py` driven by `django-environ`. `DATABASES` comes from `dj_database_url`. Whitenoise middleware sits directly after `SecurityMiddleware`, and `STORAGES` uses whitenoise's compressed manifest storage.
 - A `/healthcheck/` endpoint, exempt from login, returns 200.

@@ -17,11 +17,15 @@ services:
     build: .
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     env_file: .env
+    environment:
+      # TERRAFORM_GITHUB_PATH in .env is the path on the host. Inside the container the
+      # config is always mounted at /terraform-github.
+      TERRAFORM_GITHUB_PATH: /terraform-github
     ports:
       - "8000:8000"
     volumes:
       - .:/app
-      - ./terraform-github:/app/terraform-github:ro
+      - ${TERRAFORM_GITHUB_PATH:-./terraform-github-sample}:/terraform-github:ro
     depends_on:
       db:
         condition: service_healthy

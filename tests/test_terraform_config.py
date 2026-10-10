@@ -9,7 +9,7 @@ from catalogue.services import github_teams, terraform_config
 from catalogue.services.terraform_config import Repository, Team
 from tests.conftest import FIXTURE_TERRAFORM_GITHUB
 
-SCHEMAS = Path(__file__).parent.parent / "terraform-github" / "schemas"
+SCHEMAS = Path(__file__).parent.parent / "terraform-github-sample" / "schemas"
 
 
 class TestOrganisations:

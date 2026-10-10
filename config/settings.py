@@ -110,4 +110,4 @@ STORAGES = {
 }
 
 # A relative path is resolved against the project root; an absolute one is used as-is.
-TERRAFORM_GITHUB_PATH = BASE_DIR / env("TERRAFORM_GITHUB_PATH", default="terraform-github")
+TERRAFORM_GITHUB_PATH = BASE_DIR / env("TERRAFORM_GITHUB_PATH", default="terraform-github-sample")

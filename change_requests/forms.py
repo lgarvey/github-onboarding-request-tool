@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from catalogue.services import github_teams, terraform_config
 from portfolios.models import Portfolio
 
-# From the `name` pattern in terraform-github/schemas/terraform-repository-schema.yaml.
+# From the `name` pattern in terraform-github-sample/schemas/terraform-repository-schema.yaml.
 REPOSITORY_NAME_PATTERN = r"^[.a-zA-Z][a-zA-Z0-9_-]*$"
 
 EMPTY_CHOICE = ("", "Select…")
