@@ -13,13 +13,14 @@
 
   <dl class="row">
     <dt class="col-sm-3">Status</dt>
-    <dd class="col-sm-9"><span class="badge text-bg-secondary">{{ change_request.get_status_display }}</span></dd>
+    <dd class="col-sm-9"><span class="badge text-bg-{{ change_request.status_css }}">{{ change_request.get_status_display }}</span></dd>
     <dt class="col-sm-3">Submitted</dt>
     <dd class="col-sm-9">{{ change_request.submitted_at|date:"j M Y, H:i" }}</dd>
     <dt class="col-sm-3">Organisation</dt>
     <dd class="col-sm-9">{{ change_request.organisation }}</dd>
     <dt class="col-sm-3">Portfolio</dt>
     <dd class="col-sm-9">{{ change_request.portfolio.name }}</dd>
+    {% include "change_requests/_decision.html" %}
   </dl>
 
   <pre class="bg-body-tertiary border rounded p-3">{% for line in summary_lines %}{{ line }}

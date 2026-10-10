@@ -1,0 +1,8 @@
+{% if change_request.decided_at %}
+  <dt class="col-sm-3">{{ change_request.get_status_display }} by</dt>
+  <dd class="col-sm-9">{{ change_request.decided_by.get_full_name|default:change_request.decided_by }} on {{ change_request.decided_at|date:"j M Y, H:i" }}</dd>
+  {% if change_request.decision_comment %}
+    <dt class="col-sm-3">Comment</dt>
+    <dd class="col-sm-9">{{ change_request.decision_comment|linebreaksbr }}</dd>
+  {% endif %}
+{% endif %}

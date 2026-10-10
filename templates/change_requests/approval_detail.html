@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}{{ change_request }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'approval_list' %}">Approvals</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ change_request }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-3">{{ change_request }}</h1>
+
+  <dl class="row">
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9"><span class="badge text-bg-{{ change_request.status_css }}">{{ change_request.get_status_display }}</span></dd>
+    <dt class="col-sm-3">Requested by</dt>
+    <dd class="col-sm-9">{{ change_request.requested_by.get_full_name|default:change_request.requested_by }}{% if change_request.requested_by.email %} ({{ change_request.requested_by.email }}){% endif %}</dd>
+    <dt class="col-sm-3">Submitted</dt>
+    <dd class="col-sm-9">{{ change_request.submitted_at|date:"j M Y, H:i" }}</dd>
+    <dt class="col-sm-3">Organisation</dt>
+    <dd class="col-sm-9">{{ change_request.organisation }}</dd>
+    <dt class="col-sm-3">Portfolio</dt>
+    <dd class="col-sm-9">{{ change_request.portfolio.name }}</dd>
+    {% include "change_requests/_decision.html" %}
+  </dl>
+
+  <pre class="bg-body-tertiary border rounded p-3">{% for line in summary_lines %}{{ line }}
+{% endfor %}</pre>
+
+  {% if can_decide %}
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% for error in form.decision.errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ form.comment.id_for_label }}">Comment</label>
+        {{ form.comment }}
+        <div class="form-text">{{ form.comment.help_text }}</div>
+        {% for error in form.comment.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+      </div>
+      <button type="submit" name="decision" value="approve" class="btn btn-success">Approve</button>
+      <button type="submit" name="decision" value="reject" class="btn btn-outline-danger">Reject</button>
+    </form>
+  {% elif is_own and change_request.is_open %}
+    <div class="alert alert-info">This is your own request, so another approver for {{ change_request.portfolio.name }} needs to decide on it.</div>
+  {% endif %}
+{% endblock %}

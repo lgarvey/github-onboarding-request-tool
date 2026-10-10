@@ -4,7 +4,7 @@ A Django proof of concept for requesting GitHub repository and team access chang
 current state from the `terraform-github` YAML config, lets staff describe one change to one
 repository or team, and records it as a change request tied to an approving portfolio.
 
-It does not raise pull requests or handle approval yet. `PLAN.md` has the full spec, the build
+Portfolio approvers can approve or reject requests in the app. It does not raise pull requests yet. `PLAN.md` has the full spec, the build
 order, and what is planned next.
 
 ## Running locally
@@ -19,7 +19,6 @@ The app is served at http://localhost:8000. Migrations run when the `web` contai
 Then, in a second terminal:
 
 ```bash
-docker compose exec web python manage.py waffle_switch DISABLE_SSO on --create   # local login without SSO
 docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py seed_portfolios
 ```
@@ -27,8 +26,11 @@ docker compose exec web python manage.py seed_portfolios
 ## Signing in
 
 Every page except `/healthcheck/` requires a signed-in user. Sign-in goes through Staff SSO
-(`AUTHBROKER_*` settings) unless the `DISABLE_SSO` waffle switch is on. The switch is never
-created automatically, so SSO is the default.
+(`AUTHBROKER_*` settings) unless the `DISABLE_SSO` environment variable is on. It is off when
+unset, so SSO is the default. `.env.example` turns it on for local development.
+
+It is read at start-up, so after changing it in `.env` run `docker compose up -d` to recreate the
+container.
 
 With `DISABLE_SSO` on, `/login/` sends you to the normal Django admin login form, so local users
 need to be staff (a superuser is easiest).
@@ -79,6 +81,10 @@ A checkout placed at `./terraform-github` is gitignored, so it cannot be committ
 - **My requests** (`/requests/`) shows your submitted requests and any drafts you have not sent
   yet. Drafts can be continued or discarded.
 
+- **Approvals** (`/approvals/`) appears in the navbar for portfolio approvers. It lists the open
+  and completed requests for their portfolios, and each request can be approved or rejected with
+  a comment. The requester sees the decision in My requests.
+
 A request stores the difference from the current YAML (add, change or remove a team or user), not
 the full desired state.
 
@@ -86,6 +92,16 @@ the full desired state.
 
 Portfolios and their approvers are managed in the admin at `/admin/portfolios/`.
 `seed_portfolios` loads four made-up examples and is safe to re-run.
+
+An approver is matched to a signed-in user by email address, ignoring case. Approvers cannot
+decide on their own requests, and rejecting needs a comment. To try the approver pages locally,
+make your own account's email an approver for every example portfolio:
+
+```bash
+docker compose exec web python manage.py seed_portfolios --approver you@example.com
+```
+
+You will need a second user to submit requests, since your own are left for another approver.
 
 ## What is stubbed
 

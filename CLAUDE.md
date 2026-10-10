@@ -24,7 +24,6 @@ This project is a Django POC for requesting GitHub repo/team access changes, bac
 ```bash
 docker compose up --build                                   # run app + postgres
 docker compose exec web python manage.py migrate
-docker compose exec web python manage.py waffle_switch DISABLE_SSO on --create   # local login without SSO
 docker compose exec web python manage.py createsuperuser
 docker compose exec web python manage.py seed_portfolios
 docker compose exec web pytest

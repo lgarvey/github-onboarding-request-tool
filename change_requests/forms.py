@@ -21,6 +21,30 @@ class PortfolioForm(forms.Form):
     )
 
 
+class DecisionForm(forms.Form):
+    """An approver's decision on a submitted request."""
+
+    APPROVE, REJECT = "approve", "reject"
+
+    decision = forms.ChoiceField(choices=[(APPROVE, "Approve"), (REJECT, "Reject")])
+    comment = forms.CharField(
+        required=False,
+        max_length=2000,
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+        help_text="Shown to the requester. Required if you reject the request.",
+    )
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("decision") == self.REJECT and not cleaned.get("comment", "").strip():
+            self.add_error("comment", "Say why you are rejecting this request.")
+        return cleaned
+
+    @property
+    def approved(self):
+        return self.cleaned_data["decision"] == self.APPROVE
+
+
 class PrincipalRowForm(forms.Form):
     """One row granting a principal (team or user) a permission or role."""
 

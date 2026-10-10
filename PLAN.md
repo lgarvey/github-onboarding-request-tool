@@ -26,7 +26,7 @@ Generating PRs against `terraform-github` and running approvals in-app are **out
 | Settings | `django-environ` |
 | DB config | `dj-database-url` |
 | Static files | `whitenoise` (serves static when `DEBUG=False`) |
-| Feature flags | `django-waffle` |
+| Feature flags | `django-waffle` (installed, not used by any feature yet) |
 | Auth | `django-staff-sso-client` (https://github.com/uktrade/django-staff-sso-client) |
 | CSS | Bootstrap 5, **vendored into static files** (no CDN, no build step) |
 | JS | Vanilla JS in `static/js/`, no build step, no SPA framework. Use it freely for dynamic form rows and small UX touches |
@@ -131,13 +131,14 @@ Handle a missing or empty YAML file gracefully by treating it as an empty list r
 
 Set `AUTH_USER_MODEL = "users.User"` **before any migrations are generated**. Read the `django-staff-sso-client` README for how it maps the SSO profile onto the user model, and conform to that. Do not invent the mapping.
 
-### SSO toggle via waffle
+### SSO toggle via environment
 
-The org's existing pattern is a waffle toggle that disables SSO for local development, which reactivates the standard admin login.
+SSO can be switched off for local development, which reactivates the standard admin login.
 
-- Use a waffle **switch** (global, not per-request) named **`DISABLE_SSO`**.
-  - The name is deliberately negative so the safe default holds: if the switch is absent or off, **SSO is on**. Do **not** create this switch in a data migration.
-  - Local dev enables it via a management command or the waffle CLI (`manage.py waffle_switch DISABLE_SSO on --create`). Document this in the README.
+- The **`DISABLE_SSO`** environment variable (boolean, read into `settings.DISABLE_SSO`) controls it.
+  - The name is deliberately negative so the safe default holds: if the variable is unset or false, **SSO is on**.
+  - It is deliberately **not** a waffle switch. There is no case for dropping SSO without restarting the app, and an environment variable works on a fresh database.
+  - `.env.example` sets it to `True` for local development. Document this in the README.
 - Provide a `/login/` view and set `LOGIN_URL = "/login/"`:
   - SSO on: redirect to the authbroker login URL.
   - SSO off: redirect to `/admin/login/?next=...`.
@@ -178,7 +179,8 @@ A change request targets **exactly one repo or one team** in one org. This keeps
 - `action`: `create | modify | archive`
 - `portfolio` (FK → Portfolio, `PROTECT`)
 - `details` (JSONField): create-time metadata such as `description` and `parent_team`
-- `status`: `draft | submitted` (Phase 2 adds `approved | rejected | applied`)
+- `status`: `draft | submitted | approved | rejected` (Phase 2 adds `applied`)
+- `decided_by` (FK → User, nullable), `decided_at`, `decision_comment`: the approver's decision
 - `created_at`, `submitted_at`
 
 **`change_requests.ChangeItem`**
@@ -328,7 +330,7 @@ All tests use the fixture tree. Aim for high coverage of services and views, and
 Work through these phases in order. **At the end of each phase: all tests pass, ruff is clean, and you stop and summarise what was done and anything that needs a decision before continuing.**
 
 1. **Scaffold**: Poetry project, Django 5.2, `config/` settings via environ/dj-database-url, whitenoise, waffle installed, Dockerfile + docker-compose + `.env.example`, pytest configured, healthcheck view, base template with vendored Bootstrap. No models yet.
-2. **Users & auth**: custom `User` model as the **first** migration, staff-sso-client integration, `DISABLE_SSO` waffle switch logic, `/login/`, admin login override, `LoginRequiredMiddleware`, auth tests.
+2. **Users & auth**: custom `User` model as the **first** migration, staff-sso-client integration, `DISABLE_SSO` environment toggle, `/login/`, admin login override, `LoginRequiredMiddleware`, auth tests.
 3. **Terraform reader**: `catalogue.services.terraform_config`, fixture tree under `tests/fixtures/`, enum definitions (after inspecting the real files if present), tests.
 4. **Browse views**: organisation list and organisation detail with collapsible repos/teams and action buttons (links can 404 until later phases).
 5. **Domain models**: Portfolio, Approver (with admin inline), ChangeRequest, ChangeItem, `seed_portfolios` command, `github_users` stub, diff service + tests, summary rendering.
@@ -343,6 +345,6 @@ Work through these phases in order. **At the end of each phase: all tests pass, 
 ## Phase 2 (not in scope, design with these in mind)
 
 - Generate a branch and PR against `terraform-github` from a submitted `ChangeRequest`, using the stored items to edit YAML while preserving unknown fields.
-- In-app approval by the portfolio approvers (`approved | rejected` statuses, notifications).
+- ~~In-app approval by the portfolio approvers~~ **Built**: `/approvals/` lists open and completed requests for the portfolios a user approves (matched by email), with approve and reject (`approved | rejected` statuses, `decided_by`, `decided_at`, `decision_comment`). Notifications are still to do.
 - Replace the stubbed GitHub usernames with the GitHub API.
 - Detect stale requests where the YAML changed after submission, and warn about multiple pending requests against the same target.

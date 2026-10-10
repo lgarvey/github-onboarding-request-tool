@@ -15,6 +15,8 @@ class Action(models.TextChoices):
 class Status(models.TextChoices):
     DRAFT = "draft", "Draft"
     SUBMITTED = "submitted", "Submitted"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
 
 
 class Operation(models.TextChoices):

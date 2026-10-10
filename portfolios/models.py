@@ -12,6 +12,16 @@ class Portfolio(models.Model):
         return self.name
 
 
+def portfolios_approved_by(user):
+    """The portfolios a user can approve requests for.
+
+    Approvers are matched to users by email address, ignoring case.
+    """
+    if not user.is_authenticated or not user.email:
+        return Portfolio.objects.none()
+    return Portfolio.objects.filter(approvers__email__iexact=user.email).distinct()
+
+
 class Approver(models.Model):
     """Someone who can approve requests for a portfolio. Not necessarily an app user."""
 

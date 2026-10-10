@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Approvals{% endblock %}
+
+{% block content %}
+  <h1 class="h3 mb-3">Approvals</h1>
+  {% if portfolios %}
+    <p class="text-muted">You approve requests for: {% for portfolio in portfolios %}{{ portfolio.name }}{% if not forloop.last %}, {% endif %}{% endfor %}.</p>
+
+    <h2 class="h5 mt-4">Open</h2>
+    {% if open_requests %}
+      {% include "change_requests/_approval_table.html" with change_requests=open_requests %}
+    {% else %}
+      <p class="text-muted">Nothing is waiting for approval.</p>
+    {% endif %}
+
+    <h2 class="h5 mt-4">Completed</h2>
+    {% if completed_requests %}
+      {% include "change_requests/_approval_table.html" with change_requests=completed_requests %}
+    {% else %}
+      <p class="text-muted">No requests have been approved or rejected yet.</p>
+    {% endif %}
+  {% else %}
+    <p class="text-muted">You are not an approver for any portfolio. Approvers are matched by email address ({{ user.email|default:"your account has none" }}) and are managed in the admin.</p>
+  {% endif %}
+{% endblock %}

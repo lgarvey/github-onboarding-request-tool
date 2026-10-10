@@ -54,6 +54,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "change_requests.context_processors.approvals",
             ],
         },
     },
@@ -65,8 +66,8 @@ ASGI_APPLICATION = "config.asgi.application"
 DATABASES = {"default": dj_database_url.parse(env("DATABASE_URL"))}
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Waffle reads switches straight from the database. With the default per-process cache,
-# `manage.py waffle_switch` would not reach an already-running server.
+# Waffle (not used by any feature yet) reads switches straight from the database. With the
+# default per-process cache, `manage.py waffle_switch` would not reach a running server.
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
     "waffle": {"BACKEND": "django.core.cache.backends.dummy.DummyCache"},
@@ -81,7 +82,9 @@ AUTHENTICATION_BACKENDS = [
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 
-# Staff SSO. Sign-in goes through SSO unless the DISABLE_SSO waffle switch is on.
+# Staff SSO. Sign-in goes through SSO unless DISABLE_SSO is set, which swaps it for the
+# Django admin login form. It is read once at start-up, so changing it needs a restart.
+DISABLE_SSO = env.bool("DISABLE_SSO", default=False)
 AUTHBROKER_URL = env("AUTHBROKER_URL")
 AUTHBROKER_CLIENT_ID = env("AUTHBROKER_CLIENT_ID")
 AUTHBROKER_CLIENT_SECRET = env("AUTHBROKER_CLIENT_SECRET")

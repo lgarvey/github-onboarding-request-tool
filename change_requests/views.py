@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods, require_POST
@@ -9,6 +10,7 @@ from catalogue.choices import RepositoryPermission, TeamRole
 from catalogue.services import terraform_config
 from change_requests.choices import Action, PrincipalType, Status, TargetType
 from change_requests.forms import (
+    DecisionForm,
     PortfolioForm,
     RepositoryDetailsForm,
     TeamDetailsForm,
@@ -18,6 +20,7 @@ from change_requests.models import ChangeRequest
 from change_requests.services.diff import diff_permissions
 from change_requests.services.drafts import apply_items, save_draft
 from github_users.services import list_usernames
+from portfolios.models import portfolios_approved_by
 
 NO_CHANGES = "No changes made."
 
@@ -323,4 +326,64 @@ def change_request_detail(request, pk):
         request,
         "change_requests/detail.html",
         {"change_request": change_request, "summary_lines": change_request.summary_lines()},
+    )
+
+
+def _requests_to_approve(user):
+    """Requests, past draft, that belong to a portfolio the user approves for."""
+    return (
+        ChangeRequest.objects.filter(portfolio__in=portfolios_approved_by(user))
+        .exclude(status=Status.DRAFT)
+        .select_related("portfolio", "requested_by", "decided_by")
+    )
+
+
+def approval_list(request):
+    requests_to_approve = _requests_to_approve(request.user)
+    return render(
+        request,
+        "change_requests/approval_list.html",
+        {
+            "portfolios": portfolios_approved_by(request.user),
+            "open_requests": requests_to_approve.filter(status=Status.SUBMITTED).order_by(
+                "submitted_at", "pk"
+            ),
+            "completed_requests": requests_to_approve.exclude(status=Status.SUBMITTED).order_by(
+                "-decided_at", "-pk"
+            ),
+        },
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def approval_detail(request, pk):
+    change_request = get_object_or_404(_requests_to_approve(request.user), pk=pk)
+    is_own = change_request.requested_by_id == request.user.pk
+    can_decide = change_request.is_open and not is_own
+
+    form = DecisionForm(request.POST or None)
+    if request.method == "POST":
+        if not change_request.is_open:
+            messages.error(request, "This request has already been decided.")
+            return redirect("approval_detail", change_request.pk)
+        if is_own:
+            raise PermissionDenied("You cannot decide on your own request.")
+        if form.is_valid():
+            change_request.decide(
+                approved=form.approved, by=request.user, comment=form.cleaned_data["comment"]
+            )
+            verb = "approved" if form.approved else "rejected"
+            messages.success(request, f"You {verb} the request: {change_request}.")
+            return redirect("approval_list")
+
+    return render(
+        request,
+        "change_requests/approval_detail.html",
+        {
+            "change_request": change_request,
+            "summary_lines": change_request.summary_lines(),
+            "form": form,
+            "can_decide": can_decide,
+            "is_own": is_own,
+        },
     )

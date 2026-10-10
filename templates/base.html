@@ -20,6 +20,11 @@
             {% if user.is_authenticated %}
               <li class="nav-item"><a class="nav-link" href="{% url 'organisation_list' %}">Organisations</a></li>
               <li class="nav-item"><a class="nav-link" href="{% url 'change_request_list' %}">My requests</a></li>
+              {% if is_approver %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'approval_list' %}">Approvals{% if approvals_waiting %} <span class="badge text-bg-warning">{{ approvals_waiting }}</span>{% endif %}</a>
+                </li>
+              {% endif %}
             {% endif %}
           </ul>
           {% if user.is_authenticated %}

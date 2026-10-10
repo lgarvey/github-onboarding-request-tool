@@ -24,6 +24,16 @@ class ChangeRequest(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.DRAFT)
     created_at = models.DateTimeField(auto_now_add=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
+    # Set when a portfolio approver approves or rejects the request.
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="decided_change_requests",
+    )
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_comment = models.TextField(blank=True)
 
     class Meta:
         ordering = ["-created_at", "-pk"]
@@ -35,6 +45,26 @@ class ChangeRequest(models.Model):
         self.status = Status.SUBMITTED
         self.submitted_at = timezone.now()
         self.save(update_fields=["status", "submitted_at"])
+
+    def decide(self, *, approved, by, comment=""):
+        self.status = Status.APPROVED if approved else Status.REJECTED
+        self.decided_by = by
+        self.decided_at = timezone.now()
+        self.decision_comment = comment
+        self.save(update_fields=["status", "decided_by", "decided_at", "decision_comment"])
+
+    @property
+    def is_open(self):
+        """Submitted and waiting for an approver."""
+        return self.status == Status.SUBMITTED
+
+    def status_css(self):
+        """Bootstrap colour name for the status badge."""
+        return {
+            Status.SUBMITTED: "warning",
+            Status.APPROVED: "success",
+            Status.REJECTED: "danger",
+        }.get(self.status, "secondary")
 
     def get_edit_url(self):
         """The form that produced this request, pre-populated from it."""

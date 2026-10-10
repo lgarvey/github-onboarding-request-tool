@@ -1,12 +1,11 @@
+import environ
 import pytest
 from authbroker_client.backends import AuthbrokerBackend
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from waffle.models import Switch
-from waffle.testutils import override_switch
 
 from tests.factories import UserFactory
-from users.sso import DISABLE_SSO_SWITCH, sso_enabled
+from users.sso import sso_enabled
 
 pytestmark = pytest.mark.django_db
 
@@ -14,9 +13,8 @@ User = get_user_model()
 
 
 @pytest.fixture
-def sso_off():
-    with override_switch(DISABLE_SSO_SWITCH, active=True):
-        yield
+def sso_off(settings):
+    settings.DISABLE_SSO = True
 
 
 class TestUserModel:
@@ -81,17 +79,29 @@ class TestSsoProfileMapping:
         assert User.objects.count() == 1
 
 
-class TestSwitch:
-    def test_sso_is_enabled_when_switch_is_absent(self):
-        assert not Switch.objects.filter(name=DISABLE_SSO_SWITCH).exists()
+class TestDisableSsoSetting:
+    def test_sso_is_enabled_by_default(self):
         assert sso_enabled()
 
-    def test_sso_is_enabled_when_switch_is_off(self):
-        with override_switch(DISABLE_SSO_SWITCH, active=False):
-            assert sso_enabled()
-
-    def test_sso_is_disabled_when_switch_is_on(self, sso_off):
+    def test_sso_is_disabled_when_setting_is_on(self, sso_off):
         assert not sso_enabled()
+
+    def test_setting_defaults_to_off_when_the_variable_is_unset(self, monkeypatch):
+        monkeypatch.delenv("DISABLE_SSO", raising=False)
+
+        assert environ.Env().bool("DISABLE_SSO", default=False) is False
+
+    @pytest.mark.parametrize("value", ["on", "On", "true", "True", "1", "yes"])
+    def test_accepted_ways_of_turning_it_on(self, monkeypatch, value):
+        monkeypatch.setenv("DISABLE_SSO", value)
+
+        assert environ.Env().bool("DISABLE_SSO", default=False) is True
+
+    @pytest.mark.parametrize("value", ["off", "false", "False", "0", "no", ""])
+    def test_everything_else_leaves_sso_on(self, monkeypatch, value):
+        monkeypatch.setenv("DISABLE_SSO", value)
+
+        assert environ.Env().bool("DISABLE_SSO", default=False) is False
 
 
 class TestLoginView:

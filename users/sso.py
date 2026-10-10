@@ -1,8 +1,6 @@
-import waffle
-
-DISABLE_SSO_SWITCH = "DISABLE_SSO"
+from django.conf import settings
 
 
 def sso_enabled():
-    """SSO is on unless the DISABLE_SSO switch exists and is active."""
-    return not waffle.switch_is_active(DISABLE_SSO_SWITCH)
+    """SSO is on unless the DISABLE_SSO setting (from the environment) says otherwise."""
+    return not settings.DISABLE_SSO

@@ -46,7 +46,7 @@
               <td>{{ change_request.get_target_type_display }}: {{ change_request.target_name }}</td>
               <td>{{ change_request.get_action_display }}</td>
               <td>{{ change_request.portfolio.name }}</td>
-              <td><span class="badge text-bg-secondary">{{ change_request.get_status_display }}</span></td>
+              <td><span class="badge text-bg-{{ change_request.status_css }}">{{ change_request.get_status_display }}</span></td>
             </tr>
           {% endfor %}
         </tbody>

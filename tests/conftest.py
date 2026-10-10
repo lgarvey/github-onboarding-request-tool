@@ -11,6 +11,8 @@ FIXTURE_TERRAFORM_GITHUB = Path(__file__).parent / "fixtures" / "terraform-githu
 def _test_settings(settings):
     # Tests never read the real checkout, and don't need a collectstatic manifest.
     settings.TERRAFORM_GITHUB_PATH = FIXTURE_TERRAFORM_GITHUB
+    # A developer's .env usually turns SSO off; tests start from the real default.
+    settings.DISABLE_SSO = False
     settings.STORAGES = {
         **settings.STORAGES,
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},

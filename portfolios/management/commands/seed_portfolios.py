@@ -42,6 +42,13 @@ PORTFOLIOS = [
 class Command(BaseCommand):
     help = "Create example portfolios and approvers for demos. Safe to run more than once."
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--approver",
+            metavar="EMAIL",
+            help="Also make this email address an approver for every example portfolio.",
+        )
+
     def handle(self, *args, **options):
         for entry in PORTFOLIOS:
             portfolio, created = Portfolio.objects.get_or_create(
@@ -49,5 +56,8 @@ class Command(BaseCommand):
             )
             for name, email in entry["approvers"]:
                 portfolio.approvers.get_or_create(email=email, defaults={"name": name})
+            if options["approver"]:
+                email = options["approver"]
+                portfolio.approvers.get_or_create(email=email, defaults={"name": email})
             verb = "Created" if created else "Already present:"
             self.stdout.write(f"{verb} {portfolio.name}")
