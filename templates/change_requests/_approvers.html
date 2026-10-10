@@ -1,0 +1,8 @@
+<dt class="col-sm-3">Approvers</dt>
+<dd class="col-sm-9">
+  {% for approver in change_request.portfolio.approvers.all %}
+    {{ approver.name }} (<a href="mailto:{{ approver.email }}">{{ approver.email }}</a>){% if not forloop.last %}<br>{% endif %}
+  {% empty %}
+    <span class="text-muted">This portfolio has no approvers yet.</span>
+  {% endfor %}
+</dd>

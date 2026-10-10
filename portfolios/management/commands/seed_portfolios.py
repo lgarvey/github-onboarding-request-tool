@@ -1,4 +1,6 @@
-from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand, CommandError
+from django.db.models import Q
 
 from portfolios.models import Portfolio
 
@@ -45,19 +47,38 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--approver",
-            metavar="EMAIL",
-            help="Also make this email address an approver for every example portfolio.",
+            metavar="USER",
+            help=(
+                "Also make this existing user an approver for every example portfolio. "
+                "Give their email_user_id or their email address."
+            ),
         )
 
     def handle(self, *args, **options):
+        approver = self._find_user(options["approver"]) if options["approver"] else None
         for entry in PORTFOLIOS:
             portfolio, created = Portfolio.objects.get_or_create(
                 name=entry["name"], defaults={"description": entry["description"]}
             )
             for name, email in entry["approvers"]:
                 portfolio.approvers.get_or_create(email=email, defaults={"name": name})
-            if options["approver"]:
-                email = options["approver"]
-                portfolio.approvers.get_or_create(email=email, defaults={"name": email})
+            if approver:
+                portfolio.approvers.get_or_create(
+                    user=approver,
+                    defaults={
+                        "name": approver.get_full_name() or approver.email_user_id,
+                        "email": approver.email or f"{approver.email_user_id}@example.invalid",
+                    },
+                )
             verb = "Created" if created else "Already present:"
             self.stdout.write(f"{verb} {portfolio.name}")
+
+    def _find_user(self, identifier):
+        User = get_user_model()
+        matches = User.objects.filter(
+            Q(email_user_id__iexact=identifier) | Q(email__iexact=identifier)
+        )
+        if len(matches) != 1:
+            problem = "No user" if not matches else "More than one user"
+            raise CommandError(f"{problem} has the email_user_id or email {identifier!r}.")
+        return matches[0]

@@ -20,6 +20,7 @@
     <dd class="col-sm-9">{{ change_request.organisation }}</dd>
     <dt class="col-sm-3">Portfolio</dt>
     <dd class="col-sm-9">{{ change_request.portfolio.name }}</dd>
+    {% include "change_requests/_approvers.html" %}
     {% include "change_requests/_decision.html" %}
   </dl>
 

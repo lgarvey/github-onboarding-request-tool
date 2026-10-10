@@ -9,6 +9,10 @@
   <pre class="bg-body-tertiary border rounded p-3">{% for line in summary_lines %}{{ line }}
 {% endfor %}</pre>
 
+  <dl class="row">
+    {% include "change_requests/_approvers.html" %}
+  </dl>
+
   <form method="post" class="d-flex gap-2">
     {% csrf_token %}
     <button type="submit" class="btn btn-primary">Submit request</button>

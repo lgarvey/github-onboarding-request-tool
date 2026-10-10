@@ -6,6 +6,7 @@ from portfolios.models import Approver, Portfolio
 class ApproverInline(admin.TabularInline):
     model = Approver
     extra = 1
+    autocomplete_fields = ["user"]
 
 
 @admin.register(Portfolio)
@@ -17,6 +18,7 @@ class PortfolioAdmin(admin.ModelAdmin):
 
 @admin.register(Approver)
 class ApproverAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "portfolio")
+    list_display = ("name", "email", "portfolio", "user")
     list_filter = ("portfolio",)
-    search_fields = ("name", "email")
+    search_fields = ("name", "email", "user__email_user_id", "user__email")
+    autocomplete_fields = ["user"]

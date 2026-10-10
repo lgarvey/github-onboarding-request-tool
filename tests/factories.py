@@ -37,6 +37,7 @@ class ApproverFactory(factory.django.DjangoModelFactory):
         model = Approver
 
     portfolio = factory.SubFactory(PortfolioFactory)
+    user = None
     name = factory.Sequence(lambda n: f"Approver {n}")
     email = factory.Sequence(lambda n: f"approver{n}@example.com")
 

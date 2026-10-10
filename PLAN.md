@@ -162,8 +162,8 @@ Settings come from env: `AUTHBROKER_URL`, `AUTHBROKER_CLIENT_ID`, `AUTHBROKER_CL
 
 **`portfolios.Approver`**
 - `portfolio` (FK → Portfolio, `related_name="approvers"`)
-- `name`, `email`
-- Approvers are not necessarily app users. Phase 2 may link them to `User` by email.
+- `name`, `email` (the contact address, shown to requesters; an SSO user can have several emails, so it is not used to identify them)
+- `user` (FK → User, nullable, `SET_NULL`): the account the approver signs in with. This link is what grants access to `/approvals/`. An approver without it is a contact only.
 
 Both models are registered in admin with Approver as an inline. Add a `seed_portfolios` management command that creates 3–4 example portfolios with approvers for demos.
 
@@ -345,6 +345,6 @@ Work through these phases in order. **At the end of each phase: all tests pass, 
 ## Phase 2 (not in scope, design with these in mind)
 
 - Generate a branch and PR against `terraform-github` from a submitted `ChangeRequest`, using the stored items to edit YAML while preserving unknown fields.
-- ~~In-app approval by the portfolio approvers~~ **Built**: `/approvals/` lists open and completed requests for the portfolios a user approves (matched by email), with approve and reject (`approved | rejected` statuses, `decided_by`, `decided_at`, `decision_comment`). Notifications are still to do.
+- ~~In-app approval by the portfolio approvers~~ **Built**: `/approvals/` lists open and completed requests for the portfolios a user approves (through `Approver.user`), with approve and reject (`approved | rejected` statuses, `decided_by`, `decided_at`, `decision_comment`). Notifications are still to do.
 - Replace the stubbed GitHub usernames with the GitHub API.
 - Detect stale requests where the YAML changed after submission, and warn about multiple pending requests against the same target.

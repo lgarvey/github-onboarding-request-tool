@@ -93,9 +93,15 @@ the full desired state.
 Portfolios and their approvers are managed in the admin at `/admin/portfolios/`.
 `seed_portfolios` loads four made-up examples and is safe to re-run.
 
-An approver is matched to a signed-in user by email address, ignoring case. Approvers cannot
-decide on their own requests, and rejecting needs a comment. To try the approver pages locally,
-make your own account's email an approver for every example portfolio:
+An approver entry has a name and a **contact email**, which requesters see so they know who to
+chase. It also has an optional **user**: the account the approver signs in with. That link, not
+the email, is what gives them the Approvals page, because an SSO user can have several email
+addresses. An approver without a linked user is a contact only. Set the link in the admin once
+the person has signed in for the first time.
+
+Approvers cannot decide on their own requests, and rejecting needs a comment. To try the approver
+pages locally, link your own account to every example portfolio, giving its `email_user_id` or
+email:
 
 ```bash
 docker compose exec web python manage.py seed_portfolios --approver you@example.com

@@ -1,8 +1,11 @@
 from datetime import timedelta
 
 import pytest
+from django.contrib.auth.models import AnonymousUser
 from django.contrib.messages import get_messages
 from django.core.management import call_command
+from django.core.management.base import CommandError
+from django.db import IntegrityError
 from django.utils import timezone
 
 from change_requests.choices import Operation, Status
@@ -27,8 +30,8 @@ def portfolio():
 
 @pytest.fixture
 def approver(user, portfolio):
-    """The signed-in user, made an approver for the portfolio."""
-    ApproverFactory(portfolio=portfolio, email=user.email)
+    """The signed-in user, linked to an approver entry for the portfolio."""
+    ApproverFactory(portfolio=portfolio, user=user)
     return user
 
 
@@ -45,31 +48,97 @@ def decided(portfolio, status=Status.APPROVED, **kwargs):
 
 
 class TestWhoIsAnApprover:
-    def test_matched_by_email_ignoring_case(self, portfolio):
-        ApproverFactory(portfolio=portfolio, email="Jo.Bloggs@Example.com")
-        user = UserFactory(email="jo.bloggs@example.com")
+    def test_linked_user_approves_the_portfolio(self, user, portfolio):
+        ApproverFactory(portfolio=portfolio, user=user, email="a.different.address@example.com")
 
         assert list(portfolios_approved_by(user)) == [portfolio]
 
-    def test_user_without_email_approves_nothing(self, portfolio):
-        ApproverFactory(portfolio=portfolio, email="")
+    def test_matching_contact_email_alone_is_not_enough(self, user, portfolio):
+        ApproverFactory(portfolio=portfolio, email=user.email)
 
-        assert not portfolios_approved_by(UserFactory(email="")).exists()
+        assert not portfolios_approved_by(user).exists()
+
+    def test_anonymous_user_approves_nothing(self, portfolio):
+        ApproverFactory(portfolio=portfolio)
+
+        assert not portfolios_approved_by(AnonymousUser()).exists()
 
     def test_several_portfolios_listed_once_each(self, user):
         first, second = PortfolioFactory(name="A"), PortfolioFactory(name="B")
-        ApproverFactory(portfolio=first, email=user.email)
-        ApproverFactory(portfolio=second, email=user.email)
-        ApproverFactory(portfolio=second, email="someone.else@example.com")
+        ApproverFactory(portfolio=first, user=user)
+        ApproverFactory(portfolio=second, user=user)
+        ApproverFactory(portfolio=second, user=UserFactory())
 
         assert list(portfolios_approved_by(user)) == [first, second]
 
-    def test_seed_command_can_add_an_approver_everywhere(self):
-        call_command("seed_portfolios", approver="me@example.com")
-        call_command("seed_portfolios", approver="me@example.com")
-        user = UserFactory(email="me@example.com")
+    def test_same_user_cannot_be_linked_twice_to_one_portfolio(self, user, portfolio):
+        ApproverFactory(portfolio=portfolio, user=user)
+
+        with pytest.raises(IntegrityError):
+            ApproverFactory(portfolio=portfolio, user=user)
+
+    def test_unlinked_approvers_can_share_a_portfolio(self, portfolio):
+        ApproverFactory.create_batch(2, portfolio=portfolio)
+
+        assert portfolio.approvers.count() == 2
+
+    def test_deleting_the_user_keeps_the_approver_as_a_contact(self, portfolio):
+        approver = ApproverFactory(portfolio=portfolio, user=UserFactory())
+
+        approver.user.delete()
+
+        approver.refresh_from_db()
+        assert approver.user is None
+
+    @pytest.mark.parametrize("identifier", ["email_user_id", "email"])
+    def test_seed_command_links_a_user_everywhere(self, user, identifier):
+        value = getattr(user, identifier).upper()
+
+        call_command("seed_portfolios", approver=value)
+        call_command("seed_portfolios", approver=value)
 
         assert portfolios_approved_by(user).count() == Portfolio.objects.count() == 4
+        assert user.approver_roles.count() == 4
+
+    def test_seed_command_rejects_an_unknown_user(self):
+        with pytest.raises(CommandError, match="No user"):
+            call_command("seed_portfolios", approver="nobody@example.com")
+
+    def test_seed_command_rejects_an_ambiguous_email(self):
+        UserFactory.create_batch(2, email="shared@example.com")
+
+        with pytest.raises(CommandError, match="More than one user"):
+            call_command("seed_portfolios", approver="shared@example.com")
+
+    def test_admin_can_link_and_search_users(self, client, portfolio):
+        client.force_login(UserFactory(is_staff=True, is_superuser=True))
+        ApproverFactory(portfolio=portfolio, user=UserFactory(email="linked@example.com"))
+
+        assert client.get(f"/admin/portfolios/portfolio/{portfolio.pk}/change/").status_code == 200
+        listing = client.get("/admin/portfolios/approver/?q=linked@example.com")
+        assert listing.status_code == 200
+        assert b"linked@example.com" in listing.content
+
+
+class TestRequesterSeesApprovers:
+    def test_confirm_and_detail_list_contact_emails(self, auth_client, user, portfolio):
+        ApproverFactory(portfolio=portfolio, name="Priya Shah", email="priya.contact@example.com")
+        draft = ChangeRequestFactory(requested_by=user, portfolio=portfolio)
+
+        confirm = auth_client.get(f"/requests/{draft.pk}/confirm/").content.decode()
+        auth_client.post(f"/requests/{draft.pk}/confirm/")
+        detail = auth_client.get(f"/requests/{draft.pk}/").content.decode()
+
+        for html in (confirm, detail):
+            assert "Priya Shah" in html
+            assert "mailto:priya.contact@example.com" in html
+
+    def test_portfolio_without_approvers(self, auth_client, user, portfolio):
+        draft = ChangeRequestFactory(requested_by=user, portfolio=portfolio)
+
+        html = auth_client.get(f"/requests/{draft.pk}/confirm/").content.decode()
+
+        assert "This portfolio has no approvers yet." in html
 
 
 class TestNavbar:
