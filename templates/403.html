@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Not allowed{% endblock %}
+
+{% block content %}
+  <h1 class="h3">You do not have access to this page</h1>
+  <p>Your account is signed in but is not allowed to view this page.</p>
+  <a class="btn btn-primary" href="{% url 'organisation_list' %}">Browse organisations</a>
+{% endblock %}

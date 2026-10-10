@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Page not found{% endblock %}
+
+{% block content %}
+  <h1 class="h3">Page not found</h1>
+  <p>The organisation, repository, team or request you asked for does not exist, or is not yours to view.</p>
+  <a class="btn btn-primary" href="{% url 'organisation_list' %}">Browse organisations</a>
+{% endblock %}

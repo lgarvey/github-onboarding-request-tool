@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 
 from catalogue.choices import RepositoryPermission, TeamRole
 from catalogue.services import terraform_config
@@ -276,10 +276,51 @@ def change_request_confirm(request, pk):
     if request.method == "POST":
         change_request.submit()
         messages.success(request, f"Your request has been submitted: {change_request}.")
-        return redirect("organisation_detail", change_request.organisation)
+        return redirect("change_request_list")
 
     return render(
         request,
         "change_requests/confirm.html",
+        {"change_request": change_request, "summary_lines": change_request.summary_lines()},
+    )
+
+
+def _submitted_requests(user):
+    """A user's requests that have left draft, newest first."""
+    return (
+        ChangeRequest.objects.filter(requested_by=user)
+        .exclude(status=Status.DRAFT)
+        .select_related("portfolio")
+        .order_by("-submitted_at", "-pk")
+    )
+
+
+def change_request_list(request):
+    drafts = (
+        ChangeRequest.objects.filter(requested_by=request.user, status=Status.DRAFT)
+        .select_related("portfolio")
+        .order_by("-created_at", "-pk")
+    )
+    return render(
+        request,
+        "change_requests/list.html",
+        {"change_requests": _submitted_requests(request.user), "drafts": drafts},
+    )
+
+
+@require_POST
+def change_request_discard(request, pk):
+    draft = get_object_or_404(ChangeRequest, pk=pk, requested_by=request.user, status=Status.DRAFT)
+    description = str(draft)
+    draft.delete()
+    messages.success(request, f"Draft discarded: {description}.")
+    return redirect("change_request_list")
+
+
+def change_request_detail(request, pk):
+    change_request = get_object_or_404(_submitted_requests(request.user), pk=pk)
+    return render(
+        request,
+        "change_requests/detail.html",
         {"change_request": change_request, "summary_lines": change_request.summary_lines()},
     )

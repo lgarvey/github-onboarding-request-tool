@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}{{ change_request }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'change_request_list' %}">My requests</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ change_request }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-3">{{ change_request }}</h1>
+
+  <dl class="row">
+    <dt class="col-sm-3">Status</dt>
+    <dd class="col-sm-9"><span class="badge text-bg-secondary">{{ change_request.get_status_display }}</span></dd>
+    <dt class="col-sm-3">Submitted</dt>
+    <dd class="col-sm-9">{{ change_request.submitted_at|date:"j M Y, H:i" }}</dd>
+    <dt class="col-sm-3">Organisation</dt>
+    <dd class="col-sm-9">{{ change_request.organisation }}</dd>
+    <dt class="col-sm-3">Portfolio</dt>
+    <dd class="col-sm-9">{{ change_request.portfolio.name }}</dd>
+  </dl>
+
+  <pre class="bg-body-tertiary border rounded p-3">{% for line in summary_lines %}{{ line }}
+{% endfor %}</pre>
+{% endblock %}

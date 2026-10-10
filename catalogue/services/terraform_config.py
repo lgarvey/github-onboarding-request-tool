@@ -10,11 +10,14 @@ Both files have a single top-level organisation key. Repositories live under its
 treated as containing nothing.
 """
 
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -61,7 +64,12 @@ def _load_org_section(org: str, resource: str) -> dict:
     path = _terraform_root() / org / resource / "config.yaml"
     if not path.is_file():
         return {}
-    data = _as_dict(yaml.safe_load(path.read_text(encoding="utf-8")))
+    try:
+        data = _as_dict(yaml.safe_load(path.read_text(encoding="utf-8")))
+    except yaml.YAMLError:
+        # Show the organisation as empty rather than failing every page that lists it.
+        logger.exception("Could not parse %s", path)
+        return {}
     if org in data:
         return _as_dict(data[org])
     if len(data) == 1:

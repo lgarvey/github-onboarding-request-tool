@@ -1,6 +1,10 @@
 <div class="mb-4">
   <label class="form-label h5" for="{{ form.portfolio.id_for_label }}">Portfolio</label>
   {{ form.portfolio }}
-  <div class="form-text">{{ form.portfolio.help_text }}</div>
+  {% if form.fields.portfolio.queryset.exists %}
+    <div class="form-text">{{ form.portfolio.help_text }}</div>
+  {% else %}
+    <div class="alert alert-warning mt-2 mb-0">No portfolios have been set up yet, so requests cannot be saved. An administrator can add them in the admin.</div>
+  {% endif %}
   {% for error in form.portfolio.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
 </div>

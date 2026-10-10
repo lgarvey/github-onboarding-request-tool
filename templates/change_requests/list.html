@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}My requests{% endblock %}
+
+{% block content %}
+  <h1 class="h3 mb-3">My requests</h1>
+
+  {% if drafts %}
+    <h2 class="h5">Drafts</h2>
+    <p class="text-muted">These have not been sent. Continue to review and submit one, or discard it.</p>
+    <ul class="list-group mb-4">
+      {% for draft in drafts %}
+        <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+          <span class="me-auto">
+            <span class="fw-semibold">{{ draft }}</span>
+            <span class="text-muted ms-1">{{ draft.organisation }} · {{ draft.portfolio.name }} · started {{ draft.created_at|date:"j M Y, H:i" }}</span>
+          </span>
+          <a class="btn btn-sm btn-outline-primary" href="{% url 'change_request_confirm' draft.pk %}">Continue</a>
+          <form method="post" action="{% url 'change_request_discard' draft.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger">Discard</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+    <h2 class="h5">Submitted</h2>
+  {% endif %}
+  {% if change_requests %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th scope="col">Submitted</th>
+            <th scope="col">Organisation</th>
+            <th scope="col">Target</th>
+            <th scope="col">Action</th>
+            <th scope="col">Portfolio</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for change_request in change_requests %}
+            <tr>
+              <td><a href="{% url 'change_request_detail' change_request.pk %}">{{ change_request.submitted_at|date:"j M Y, H:i" }}</a></td>
+              <td>{{ change_request.organisation }}</td>
+              <td>{{ change_request.get_target_type_display }}: {{ change_request.target_name }}</td>
+              <td>{{ change_request.get_action_display }}</td>
+              <td>{{ change_request.portfolio.name }}</td>
+              <td><span class="badge text-bg-secondary">{{ change_request.get_status_display }}</span></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted">You have not submitted any requests yet.</p>
+    <a class="btn btn-primary" href="{% url 'organisation_list' %}">Browse organisations</a>
+  {% endif %}
+{% endblock %}

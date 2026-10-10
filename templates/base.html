@@ -19,6 +19,7 @@
           <ul class="navbar-nav me-auto">
             {% if user.is_authenticated %}
               <li class="nav-item"><a class="nav-link" href="{% url 'organisation_list' %}">Organisations</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'change_request_list' %}">My requests</a></li>
             {% endif %}
           </ul>
           {% if user.is_authenticated %}
