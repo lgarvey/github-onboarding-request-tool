@@ -31,7 +31,7 @@
                   </span>
                   {% if not repo.archived %}
                     <a class="btn btn-sm btn-outline-primary" href="{% url 'repository_edit' org repo.name %}">Edit collaborators</a>
-                    <a class="btn btn-sm btn-outline-danger" href="/orgs/{{ org|urlencode:'' }}/repos/{{ repo.name|urlencode:'' }}/archive/">Archive</a>
+                    <a class="btn btn-sm btn-outline-danger" href="{% url 'repository_archive' org repo.name %}">Archive</a>
                   {% endif %}
                 </li>
               {% endfor %}
@@ -39,7 +39,7 @@
           {% else %}
             <p class="text-muted">This organisation has no repositories.</p>
           {% endif %}
-          <a class="btn btn-primary" href="/orgs/{{ org|urlencode:'' }}/repos/new/">Add repository</a>
+          <a class="btn btn-primary" href="{% url 'repository_create' org %}">Add repository</a>
         </div>
       </div>
     </div>
@@ -69,7 +69,7 @@
           {% else %}
             <p class="text-muted">This organisation has no teams.</p>
           {% endif %}
-          <a class="btn btn-primary" href="/orgs/{{ org|urlencode:'' }}/teams/new/">Add team</a>
+          <a class="btn btn-primary" href="{% url 'team_create' org %}">Add team</a>
         </div>
       </div>
     </div>

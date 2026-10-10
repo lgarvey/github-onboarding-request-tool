@@ -8,7 +8,12 @@ from django.views.decorators.http import require_http_methods
 from catalogue.choices import RepositoryPermission, TeamRole
 from catalogue.services import terraform_config
 from change_requests.choices import Action, PrincipalType, Status, TargetType
-from change_requests.forms import PortfolioForm, build_principal_formset
+from change_requests.forms import (
+    PortfolioForm,
+    RepositoryDetailsForm,
+    TeamDetailsForm,
+    build_principal_formset,
+)
 from change_requests.models import ChangeRequest
 from change_requests.services.diff import diff_permissions
 from change_requests.services.drafts import apply_items, save_draft
@@ -44,7 +49,7 @@ def _user_choices():
 
 @dataclass(frozen=True)
 class Section:
-    """One group of dynamic rows on an edit form."""
+    """One group of dynamic rows on a form."""
 
     context_name: str
     prefix: str
@@ -54,15 +59,60 @@ class Section:
     permission_choices: list
 
 
-def _edit_access(request, *, org, target_type, target_name, sections, template, context):
-    """Show and process a form that changes who has access to an existing repository or team."""
-    draft = _get_draft(
-        request,
-        organisation=org,
-        target_type=target_type,
-        target_name=target_name,
-        action=Action.MODIFY,
+def _team_permissions_section(org, current):
+    return Section(
+        context_name="team_formset",
+        prefix="teams",
+        principal_type=PrincipalType.TEAM,
+        current=current,
+        principal_choices=_team_choices(org),
+        permission_choices=RepositoryPermission.choices,
     )
+
+
+def _user_permissions_section(current):
+    return Section(
+        context_name="user_formset",
+        prefix="users",
+        principal_type=PrincipalType.USER,
+        current=current,
+        principal_choices=_user_choices(),
+        permission_choices=RepositoryPermission.choices,
+    )
+
+
+def _members_section(current):
+    return Section(
+        context_name="member_formset",
+        prefix="members",
+        principal_type=PrincipalType.USER,
+        current=current,
+        principal_choices=_user_choices(),
+        permission_choices=TeamRole.choices,
+    )
+
+
+def _change_form(
+    request,
+    *,
+    org,
+    target_type,
+    action,
+    sections,
+    template,
+    context,
+    target_name=None,
+    details_form_class=None,
+):
+    """Show and process a form that drafts a change request.
+
+    Existing targets pass `target_name`. Creates pass `details_form_class` instead, which
+    supplies the new name and the request's `details`.
+    """
+    match = {"organisation": org, "target_type": target_type, "action": action}
+    if target_name is not None:
+        match["target_name"] = target_name
+    draft = _get_draft(request, **match)
     draft_items = list(draft.items.all()) if draft else []
     data = request.POST or None
 
@@ -80,75 +130,107 @@ def _edit_access(request, *, org, target_type, target_name, sections, template, 
         )
         formsets.append((section, formset))
     portfolio_form = PortfolioForm(data, initial={"portfolio": draft and draft.portfolio_id})
+    details_form = details_form_class(data, org=org, draft=draft) if details_form_class else None
+
+    all_forms = [*(formset for _, formset in formsets), portfolio_form]
+    if details_form:
+        all_forms.append(details_form)
+    forms_valid = [form.is_valid() for form in all_forms]
 
     errors = []
-    forms_valid = [
-        form.is_valid() for form in (*(formset for _, formset in formsets), portfolio_form)
-    ]
     if request.method == "POST" and all(forms_valid):
         # The diff is always against the YAML, not against what the form started with.
         items = []
         for section, formset in formsets:
             items += diff_permissions(section.current, formset.desired(), section.principal_type)
-        if items:
+        if action == Action.MODIFY and not items:
+            errors.append(NO_CHANGES)
+        else:
             change_request = save_draft(
                 requested_by=request.user,
                 organisation=org,
                 target_type=target_type,
-                target_name=target_name,
-                action=Action.MODIFY,
+                target_name=details_form.target_name() if details_form else target_name,
+                action=action,
                 portfolio=portfolio_form.cleaned_data["portfolio"],
                 items=items,
+                details=details_form.details() if details_form else None,
                 draft=draft,
             )
             return redirect("change_request_confirm", change_request.pk)
-        errors.append(NO_CHANGES)
 
     context = {
         **context,
         **{section.context_name: formset for section, formset in formsets},
         "org": org,
         "portfolio_form": portfolio_form,
+        "details_form": details_form,
         "errors": errors,
     }
     return render(request, template, context)
 
 
-@require_http_methods(["GET", "POST"])
-def repository_edit(request, org, repo):
+def _get_repository(org, repo):
     _require_organisation(org)
     repository = terraform_config.get_repository(org, repo)
     if repository is None:
         raise Http404("Unknown repository")
+    return repository
+
+
+@require_http_methods(["GET", "POST"])
+def repository_edit(request, org, repo):
+    repository = _get_repository(org, repo)
     if repository.archived:
         messages.error(request, f"{repository.name} is archived and cannot be edited.")
         return redirect("organisation_detail", org)
 
-    return _edit_access(
+    return _change_form(
         request,
         org=org,
         target_type=TargetType.REPOSITORY,
         target_name=repository.name,
+        action=Action.MODIFY,
         sections=[
-            Section(
-                context_name="team_formset",
-                prefix="teams",
-                principal_type=PrincipalType.TEAM,
-                current=repository.team_permissions,
-                principal_choices=_team_choices(org),
-                permission_choices=RepositoryPermission.choices,
-            ),
-            Section(
-                context_name="user_formset",
-                prefix="users",
-                principal_type=PrincipalType.USER,
-                current=repository.user_permissions,
-                principal_choices=_user_choices(),
-                permission_choices=RepositoryPermission.choices,
-            ),
+            _team_permissions_section(org, repository.team_permissions),
+            _user_permissions_section(repository.user_permissions),
         ],
         template="change_requests/repository_edit.html",
         context={"repository": repository},
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def repository_archive(request, org, repo):
+    repository = _get_repository(org, repo)
+    if repository.archived:
+        messages.error(request, f"{repository.name} is already archived.")
+        return redirect("organisation_detail", org)
+
+    return _change_form(
+        request,
+        org=org,
+        target_type=TargetType.REPOSITORY,
+        target_name=repository.name,
+        action=Action.ARCHIVE,
+        sections=[],
+        template="change_requests/repository_archive.html",
+        context={"repository": repository},
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def repository_create(request, org):
+    _require_organisation(org)
+    return _change_form(
+        request,
+        org=org,
+        target_type=TargetType.REPOSITORY,
+        action=Action.CREATE,
+        details_form_class=RepositoryDetailsForm,
+        sections=[_team_permissions_section(org, {}), _user_permissions_section({})],
+        template="change_requests/repository_create.html",
+        context={},
     )
 
 
@@ -159,23 +241,30 @@ def team_edit(request, org, slug):
     if team is None:
         raise Http404("Unknown team")
 
-    return _edit_access(
+    return _change_form(
         request,
         org=org,
         target_type=TargetType.TEAM,
         target_name=team.slug,
-        sections=[
-            Section(
-                context_name="member_formset",
-                prefix="members",
-                principal_type=PrincipalType.USER,
-                current=team.members,
-                principal_choices=_user_choices(),
-                permission_choices=TeamRole.choices,
-            ),
-        ],
+        action=Action.MODIFY,
+        sections=[_members_section(team.members)],
         template="change_requests/team_edit.html",
         context={"team": team},
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def team_create(request, org):
+    _require_organisation(org)
+    return _change_form(
+        request,
+        org=org,
+        target_type=TargetType.TEAM,
+        action=Action.CREATE,
+        details_form_class=TeamDetailsForm,
+        sections=[_members_section({})],
+        template="change_requests/team_create.html",
+        context={},
     )
 
 

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Archive {{ repository.name }}{% endblock %}
+
+{% block content %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% url 'organisation_list' %}">Organisations</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'organisation_detail' org %}">{{ org }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ repository.name }}</li>
+    </ol>
+  </nav>
+  <h1 class="h3 mb-3">Archive {{ repository.name }}</h1>
+  <p>Archiving makes the repository read-only. You are asking for <strong>{{ repository.name }}</strong> in <strong>{{ org }}</strong> to be archived.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "change_requests/_portfolio_field.html" with form=portfolio_form %}
+    <button type="submit" class="btn btn-danger">Review request</button>
+    <a class="btn btn-link" href="{% url 'organisation_detail' org %}">Cancel</a>
+  </form>
+{% endblock %}

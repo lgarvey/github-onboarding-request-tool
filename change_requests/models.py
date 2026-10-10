@@ -37,12 +37,18 @@ class ChangeRequest(models.Model):
         self.save(update_fields=["status", "submitted_at"])
 
     def get_edit_url(self):
-        """The form that produced this request, pre-populated from it. None if there isn't one."""
-        if self.action == Action.MODIFY:
-            name = "team_edit" if self.target_type == TargetType.TEAM else "repository_edit"
+        """The form that produced this request, pre-populated from it."""
+        is_team = self.target_type == TargetType.TEAM
+        if self.action == Action.CREATE:
+            url = reverse(
+                "team_create" if is_team else "repository_create", args=[self.organisation]
+            )
+        elif self.action == Action.ARCHIVE:
+            url = reverse("repository_archive", args=[self.organisation, self.target_name])
+        else:
+            name = "team_edit" if is_team else "repository_edit"
             url = reverse(name, args=[self.organisation, self.target_name])
-            return f"{url}?draft={self.pk}"
-        return None
+        return f"{url}?draft={self.pk}"
 
     def heading(self):
         target = f"{self.target_name} (org: {self.organisation})"
