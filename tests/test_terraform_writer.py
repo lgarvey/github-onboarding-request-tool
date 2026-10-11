@@ -417,3 +417,26 @@ class TestProblems:
         terraform_writer.modify_repository("acme", "trade-api", archived=True).write()
 
         assert terraform_config.get_repository("acme", "trade-api").archived is True
+
+    def test_new_directories_get_the_owner_of_the_directory_they_go_in(
+        self, writable_config, monkeypatch
+    ):
+        owned = {}
+        monkeypatch.setattr(os, "chown", lambda target, uid, gid: owned.update({target: uid}))
+        organisation = writable_config / "terraform" / "bare-org"
+
+        terraform_writer.create_repository("bare-org", "first").write()
+
+        assert owned[organisation / "repositories"] == organisation.stat().st_uid
+
+    def test_new_directory_ownership_that_cannot_be_changed_is_not_an_error(
+        self, writable_config, monkeypatch
+    ):
+        def refuse(*args):
+            raise PermissionError
+
+        monkeypatch.setattr(os, "chown", refuse)
+
+        terraform_writer.create_repository("bare-org", "first").write()
+
+        assert path(writable_config, "bare-org", "repositories").is_file()

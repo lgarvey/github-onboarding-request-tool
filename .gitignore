@@ -222,3 +222,6 @@ __marimo__/
 # Project
 /staticfiles/
 /terraform-github/
+
+# Demo recording output
+/demo/output/

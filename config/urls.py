@@ -5,6 +5,9 @@ from django.urls import include, path
 from config import views
 from users import views as user_views
 
+admin.site.site_header = "GitHub Access Requests admin"
+admin.site.site_title = "GitHub Access Requests admin"
+
 urlpatterns = [
     # Must come before admin.site.urls so it takes over /admin/login/.
     path("admin/login/", user_views.admin_login, name="admin_login"),

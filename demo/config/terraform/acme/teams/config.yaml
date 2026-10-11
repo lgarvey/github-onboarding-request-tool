@@ -1,0 +1,33 @@
+---
+# Made-up data for the demo recording. Nothing here is real.
+acme:
+  slug: acme
+  teams:
+    data-engineering:
+      name: Data Engineering
+      slug: data-engineering
+      description: Pipelines and warehouses
+      privacy: closed
+      parent_team_id: null
+      members:
+        mjones: maintainer
+        kpatel: member
+        jbloggs: member
+    platform-sre:
+      name: Platform SRE
+      slug: platform-sre
+      description: Runs the platform
+      privacy: closed
+      parent_team_id: null
+      members:
+        jbloggs: maintainer
+        asmith: member
+    platform-sre-oncall:
+      name: Platform SRE On-call
+      slug: platform-sre-oncall
+      description: Out-of-hours rota
+      privacy: closed
+      # The ID of platform-sre.
+      parent_team_id: 3152637
+      members:
+        asmith: member

@@ -58,7 +58,7 @@ class Edit:
     def write(self) -> None:
         """Save the file, replacing it in one step so a failure cannot leave it half-written."""
         try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self._make_directories()
             handle, temp_name = tempfile.mkstemp(dir=self.path.parent, prefix=".config-", text=True)
             try:
                 with os.fdopen(handle, "w", encoding="utf-8") as temp:
@@ -70,6 +70,21 @@ class Edit:
                 raise
         except OSError as error:
             raise ConfigError(f"Could not write {self.path.name}: {error.strerror}.") from error
+
+    def _make_directories(self) -> None:
+        """Create the file's missing directories, owned like the directory they go in."""
+        missing = []
+        directory = self.path.parent
+        while not directory.exists():
+            missing.append(directory)
+            directory = directory.parent
+        owner = directory.stat()
+        for directory in reversed(missing):
+            directory.mkdir(exist_ok=True)
+            try:
+                os.chown(directory, owner.st_uid, owner.st_gid)
+            except PermissionError:
+                pass
 
     def _match_ownership(self, temp_name: str) -> None:
         """Give the new file the owner and mode of the one it replaces, or of its directory.

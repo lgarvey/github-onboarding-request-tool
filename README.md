@@ -8,6 +8,9 @@ Portfolio approvers can approve or reject requests in the app, and an approved r
 written straight into the YAML. It does not raise pull requests yet. `PLAN.md` has the full spec, the build
 order, and what is planned next.
 
+**[Watch the three-minute demo](demo/demo.mp4)**: a request going from a new organisation to an
+approved YAML change. It uses made-up data throughout.
+
 ## Running locally
 
 ```bash
@@ -147,6 +150,24 @@ written to unless you ask. `.env.example` turns it on, because the default path 
 Nothing is committed or pushed. With the sample tree, `git diff terraform-github-sample` shows
 what the app wrote and `git checkout -- terraform-github-sample` undoes it.
 
+## Recording the demo video
+
+```bash
+./demo/record.sh
+```
+
+This drives the app through the whole story in a headless browser and writes
+`demo/output/demo.mp4` (about three minutes, with captions), plus `demo/output/narration.md`,
+which lists each caption with the time it appears and doubles as a voiceover script.
+
+It needs only Docker. It uses a throwaway database and a copy of the made-up config in
+`demo/config/`, so it never touches your own data or `TERRAFORM_GITHUB_PATH`. The story is in
+`demo/walkthrough.py`: edit the captions and steps there and run it again. `DEMO_SPEED=0.2`
+hurries through the pauses to check a change quickly.
+
+The video linked at the top of this page is `demo/demo.mp4`. After re-recording, copy
+`demo/output/demo.mp4` over it to publish the new take.
+
 ## What is stubbed
 
 Both stubs are single functions, so a GitHub API implementation can replace them without touching
@@ -188,4 +209,5 @@ Python 3.13: `docker compose exec web poetry add --lock <package>`), then rebuil
 | `portfolios/` | Portfolio and approver models, `seed_portfolios` |
 | `change_requests/` | Change request models, forms, diff, draft and apply services, request and approval pages |
 | `github_users/` | Stubbed GitHub usernames |
+| `demo/` | Scripted demo recording: story, made-up data and recorder image |
 | `static/` | Vendored Bootstrap 5, `js/formset.js` for add and remove rows |

@@ -1,0 +1,44 @@
+---
+# Made-up data for the demo recording. Nothing here is real.
+acme:
+  slug: acme
+  repositories:
+    data-pipeline:
+      name: data-pipeline
+      description: Nightly loads into the warehouse
+      visibility: private
+      archived: false
+      team_permissions:
+        data-engineering: admin
+      user_permissions: {}
+    design-docs:
+      name: design-docs
+      description: Architecture decision records
+      visibility: internal
+      archived: false
+      team_permissions:
+        platform-sre: maintain
+        data-engineering: push
+      user_permissions: {}
+    legacy-importer:
+      name: legacy-importer
+      description: Replaced by data-pipeline
+      visibility: private
+      archived: true
+      team_permissions:
+        platform-sre: admin
+      user_permissions: {}
+    trade-api:
+      name: trade-api
+      description: Public API for trade data
+      visibility: internal
+      archived: false
+      # Branch protection for this repository is managed separately.
+      delete_branch_on_merge: true
+      has_issues: true
+      team_permissions:
+        platform-sre: admin
+        data-engineering: push
+      user_permissions:
+        jbloggs: maintain
+        old-contractor: pull
