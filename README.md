@@ -1,7 +1,3 @@
-
-
-https://github.com/user-attachments/assets/e9544119-89b5-4a20-aa2f-cc100edb0a72
-
 # github-onboarding-request-tool
 
 A Django proof of concept for requesting GitHub repository and team access changes. It reads the
@@ -12,8 +8,10 @@ Portfolio approvers can approve or reject requests in the app, and an approved r
 written straight into the YAML. It does not raise pull requests yet. `PLAN.md` has the full spec, the build
 order, and what is planned next.
 
-**[Watch the three-minute demo](demo/demo.mp4)**: a request going from a new organisation to an
-approved YAML change. It uses made-up data throughout.
+A three-minute demo, from setting up a new organisation to an approved YAML change. It uses
+made-up data throughout.
+
+https://github.com/user-attachments/assets/e9544119-89b5-4a20-aa2f-cc100edb0a72
 
 ## Running locally
 
@@ -169,8 +167,9 @@ It needs only Docker. It uses a throwaway database and a copy of the made-up con
 `demo/walkthrough.py`: edit the captions and steps there and run it again. `DEMO_SPEED=0.2`
 hurries through the pauses to check a change quickly.
 
-The video linked at the top of this page is `demo/demo.mp4`. After re-recording, copy
-`demo/output/demo.mp4` over it to publish the new take.
+The video at the top of this page is hosted by GitHub, not kept in the repo. To publish a new
+take, edit this README on GitHub, drag `demo/output/demo.mp4` into the editor, and replace the
+old `user-attachments` URL with the one it inserts.
 
 ## What is stubbed
 
