@@ -1,0 +1,4 @@
+{% if change_request.applied_diff %}
+  <h2 class="h5 mt-4">Change made to the YAML</h2>
+  <pre class="bg-body-tertiary border rounded p-3 small">{{ change_request.applied_diff }}</pre>
+{% endif %}

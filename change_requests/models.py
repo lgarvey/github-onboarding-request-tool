@@ -34,6 +34,9 @@ class ChangeRequest(models.Model):
     )
     decided_at = models.DateTimeField(null=True, blank=True)
     decision_comment = models.TextField(blank=True)
+    # Set when an approved request has been written into the YAML config.
+    applied_at = models.DateTimeField(null=True, blank=True)
+    applied_diff = models.TextField(blank=True)
 
     class Meta:
         ordering = ["-created_at", "-pk"]
@@ -53,6 +56,22 @@ class ChangeRequest(models.Model):
         self.decision_comment = comment
         self.save(update_fields=["status", "decided_by", "decided_at", "decision_comment"])
 
+    def mark_applied(self, diff=""):
+        self.status = Status.APPLIED
+        self.applied_at = timezone.now()
+        self.applied_diff = diff
+        self.save(update_fields=["status", "applied_at", "applied_diff"])
+
+    @property
+    def decision_label(self):
+        """How the approver's decision reads, whatever has happened to the request since."""
+        return "Rejected" if self.status == Status.REJECTED else "Approved"
+
+    @property
+    def can_be_applied(self):
+        """Approved, and not yet written into the YAML."""
+        return self.status == Status.APPROVED
+
     @property
     def is_open(self):
         """Submitted and waiting for an approver."""
@@ -64,6 +83,7 @@ class ChangeRequest(models.Model):
             Status.SUBMITTED: "warning",
             Status.APPROVED: "success",
             Status.REJECTED: "danger",
+            Status.APPLIED: "primary",
         }.get(self.status, "secondary")
 
     def get_edit_url(self):

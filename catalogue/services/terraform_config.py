@@ -1,9 +1,12 @@
 """Read-only access to the terraform-github YAML config.
 
+Which organisations exist, and which directory each one's config is in, comes from the
+`catalogue.Organisation` model. Organisations are referred to by their GitHub name.
+
 Layout, relative to settings.TERRAFORM_GITHUB_PATH:
 
-    terraform/{organisation}/repositories/config.yaml
-    terraform/{organisation}/teams/config.yaml
+    terraform/{directory}/repositories/config.yaml
+    terraform/{directory}/teams/config.yaml
 
 Both files have a single top-level organisation key. Repositories live under its
 `repositories` mapping and teams under its `teams` mapping. Missing or empty files are
@@ -16,6 +19,8 @@ from pathlib import Path
 
 import yaml
 from django.conf import settings
+
+from catalogue.models import Organisation
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +51,21 @@ def _terraform_root() -> Path:
 
 
 def list_organisations() -> list[str]:
+    """The GitHub names of the organisations this app manages."""
+    return list(Organisation.objects.values_list("name", flat=True))
+
+
+def get_directory(org: str) -> str | None:
+    """The directory under terraform/ holding the organisation's config, if it is known."""
+    return Organisation.objects.filter(name=org).values_list("directory", flat=True).first()
+
+
+def config_path(directory: str, resource: str) -> Path:
+    return _terraform_root() / directory / resource / "config.yaml"
+
+
+def list_directories() -> list[str]:
+    """The directories that exist under terraform/, whether or not they are managed."""
     root = _terraform_root()
     if not root.is_dir():
         return []
@@ -56,12 +76,9 @@ def _as_dict(value) -> dict:
     return value if isinstance(value, dict) else {}
 
 
-def _load_org_section(org: str, resource: str) -> dict:
-    """Return the organisation's mapping from `{org}/{resource}/config.yaml`."""
-    # Only ever build paths from directory names we discovered ourselves.
-    if org not in list_organisations():
-        return {}
-    path = _terraform_root() / org / resource / "config.yaml"
+def _load_section(directory: str, resource: str) -> dict:
+    """Return the organisation's mapping from `{directory}/{resource}/config.yaml`."""
+    path = config_path(directory, resource)
     if not path.is_file():
         return {}
     try:
@@ -70,12 +87,27 @@ def _load_org_section(org: str, resource: str) -> dict:
         # Show the organisation as empty rather than failing every page that lists it.
         logger.exception("Could not parse %s", path)
         return {}
-    if org in data:
-        return _as_dict(data[org])
+    if directory in data:
+        return _as_dict(data[directory])
     if len(data) == 1:
         # The top-level key normally mirrors the directory name; tolerate it differing.
         return _as_dict(next(iter(data.values())))
     return {}
+
+
+def _load_org_section(org: str, resource: str) -> dict:
+    # Paths are only ever built from directories recorded against an organisation.
+    directory = get_directory(org)
+    return _load_section(directory, resource) if directory else {}
+
+
+def github_name(directory: str) -> str | None:
+    """The GitHub name (`slug`) recorded in a directory's config files, if there is one."""
+    for resource in ("repositories", "teams"):
+        slug = _load_section(directory, resource).get("slug")
+        if isinstance(slug, str) and slug:
+            return slug
+    return None
 
 
 def _permissions(value) -> dict[str, str]:

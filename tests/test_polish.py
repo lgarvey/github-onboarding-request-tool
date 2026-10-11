@@ -5,6 +5,7 @@ import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
 
+from catalogue.models import Organisation
 from catalogue.services import terraform_config
 from change_requests.choices import Status
 from change_requests.models import ChangeRequest
@@ -76,6 +77,7 @@ class TestDrafts:
 class TestEdgeCases:
     def test_malformed_yaml_is_treated_as_empty_and_logged(self, settings, caplog):
         settings.TERRAFORM_GITHUB_PATH = BROKEN
+        Organisation.objects.create(name="broken")
 
         with caplog.at_level(logging.ERROR):
             repositories = terraform_config.get_repositories("broken")
@@ -86,6 +88,7 @@ class TestEdgeCases:
 
     def test_organisation_page_survives_malformed_yaml(self, auth_client, settings):
         settings.TERRAFORM_GITHUB_PATH = BROKEN
+        Organisation.objects.create(name="broken")
 
         response = auth_client.get("/orgs/broken/")
 

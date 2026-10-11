@@ -120,3 +120,53 @@ class TestSubmitLandsOnMyRequests:
         page = auth_client.get(LIST)
         assert list(page.context["change_requests"]) == [draft]
         assert b"has been submitted" in page.content
+
+
+class TestAdminOverview:
+    @pytest.fixture
+    def admin_client(self, client):
+        client.force_login(UserFactory(is_staff=True, is_superuser=True))
+        return client
+
+    def test_lists_filters_and_searches_every_request(self, admin_client):
+        applied = ChangeRequestFactory(status=Status.APPLIED, target_name="trade-api")
+        ChangeItemFactory(change_request=applied, principal_name="asmith")
+        ChangeRequestFactory(status=Status.DRAFT, target_name="design-docs")
+
+        everything = admin_client.get("/admin/change_requests/changerequest/")
+        filtered = admin_client.get("/admin/change_requests/changerequest/?status__exact=applied")
+        searched = admin_client.get("/admin/change_requests/changerequest/?q=asmith")
+
+        assert b"trade-api" in everything.content and b"design-docs" in everything.content
+        for response in (filtered, searched):
+            assert b"trade-api" in response.content
+            assert b"design-docs" not in response.content
+
+    def test_shows_a_request_with_its_changes_and_diff(self, admin_client):
+        change_request = ChangeRequestFactory(status=Status.APPLIED, applied_diff="+ <added>")
+        ChangeItemFactory(change_request=change_request, principal_name="asmith")
+        url = f"/admin/change_requests/changerequest/{change_request.pk}/change/"
+
+        response = admin_client.get(url)
+
+        assert response.status_code == 200
+        assert b"Add user asmith with push" in response.content
+        assert b"<pre>+ &lt;added&gt;</pre>" in response.content
+
+    def test_shows_a_request_that_has_not_been_applied(self, admin_client):
+        url = f"/admin/change_requests/changerequest/{ChangeRequestFactory().pk}/change/"
+
+        response = admin_client.get(url)
+
+        assert response.status_code == 200
+        assert b"<pre>" not in response.content
+
+    def test_is_read_only(self, admin_client):
+        change_request = ChangeRequestFactory(status=Status.SUBMITTED)
+        base = "/admin/change_requests/changerequest/"
+
+        assert admin_client.get(f"{base}add/").status_code == 403
+        assert admin_client.post(f"{base}{change_request.pk}/change/", {}).status_code == 403
+        assert admin_client.post(f"{base}{change_request.pk}/delete/", {}).status_code == 403
+        change_request.refresh_from_db()
+        assert change_request.status == Status.SUBMITTED

@@ -1,6 +1,8 @@
 import pytest
 from django.urls import reverse
 
+from catalogue.models import Organisation
+
 pytestmark = pytest.mark.django_db
 
 
@@ -24,12 +26,12 @@ class TestOrganisationList:
         assert response.context["organisations"] == ["acme", "bare-org", "empty-org", "legacy"]
         assert b'href="/orgs/acme/"' in response.content
 
-    def test_empty_state(self, auth_client, settings, tmp_path):
-        settings.TERRAFORM_GITHUB_PATH = tmp_path
+    def test_empty_state(self, auth_client):
+        Organisation.objects.all().delete()
 
         response = auth_client.get(reverse("organisation_list"))
 
-        assert b"No organisations were found" in response.content
+        assert b"No organisations have been set up yet" in response.content
 
     def test_navbar_shows_user_and_links(self, auth_client, user):
         html = auth_client.get(reverse("organisation_list")).content.decode()

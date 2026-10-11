@@ -1,0 +1,11 @@
+# Defaults for a team created through the app.
+#
+# Every key here is written into teams/config.yaml for a new team. `name`, `slug`,
+# `description`, `parent_team_id` and `members` are filled in from the request.
+# Keys and allowed values come from terraform-team-schema.yaml.
+name: null
+slug: null
+description: null
+privacy: closed
+parent_team_id: null
+members: {}

@@ -28,6 +28,24 @@
   <pre class="bg-body-tertiary border rounded p-3">{% for line in summary_lines %}{{ line }}
 {% endfor %}</pre>
 
+  {% if preview_error %}
+    <div class="alert alert-warning">This request no longer fits the YAML config: {{ preview_error }}</div>
+  {% elif preview_diff %}
+    <h2 class="h5 mt-4">{% if change_request.is_open %}What approving will change in the YAML{% else %}Change waiting to be made to the YAML{% endif %}</h2>
+    <pre class="bg-body-tertiary border rounded p-3 small">{{ preview_diff }}</pre>
+  {% elif preview_diff is not None %}
+    <div class="alert alert-info">The YAML config already matches this request, so approving will not change it.</div>
+  {% endif %}
+
+  {% include "change_requests/_applied_diff.html" %}
+
+  {% if can_apply %}
+    <form method="post" action="{% url 'approval_apply' change_request.pk %}" class="mb-3">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Apply to YAML</button>
+    </form>
+  {% endif %}
+
   {% if can_decide %}
     <form method="post" novalidate>
       {% csrf_token %}

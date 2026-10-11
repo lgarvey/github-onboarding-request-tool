@@ -25,7 +25,7 @@ services:
       - "8000:8000"
     volumes:
       - .:/app
-      - ${TERRAFORM_GITHUB_PATH:-./terraform-github-sample}:/terraform-github:ro
+      - ${TERRAFORM_GITHUB_PATH:-./terraform-github-sample}:/terraform-github
     depends_on:
       db:
         condition: service_healthy

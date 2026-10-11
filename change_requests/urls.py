@@ -14,6 +14,7 @@ urlpatterns = [
     path("orgs/<str:org>/teams/<str:slug>/edit/", views.team_edit, name="team_edit"),
     path("approvals/", views.approval_list, name="approval_list"),
     path("approvals/<int:pk>/", views.approval_detail, name="approval_detail"),
+    path("approvals/<int:pk>/apply/", views.approval_apply, name="approval_apply"),
     path("requests/", views.change_request_list, name="change_request_list"),
     path("requests/<int:pk>/", views.change_request_detail, name="change_request_detail"),
     path(

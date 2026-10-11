@@ -73,7 +73,7 @@ terraform-github/terraform/{organisation-name}/
   teams/config.yaml
 ```
 
-- **Organisations** are the top-level directories under `terraform-github/terraform/`.
+- **Organisations** are rows in the `catalogue.Organisation` model: a GitHub name and the directory under `terraform-github/terraform/` holding its config (defaults to the name). Directories without a row are ignored; `import_organisations` creates rows for existing directories. A new organisation's files are created on the first applied change.
 - **Repositories** are read from `repositories/config.yaml`. The top-level key is the organisation, mirroring the org directory name:
 
 ```yaml
@@ -173,13 +173,14 @@ A change request targets **exactly one repo or one team** in one org. This keeps
 
 **`change_requests.ChangeRequest`**
 - `requested_by` (FK → User)
-- `organisation` (str, org directory name)
+- `organisation` (str, the organisation's GitHub name)
 - `target_type`: `repository | team`
 - `target_name` (str; for creates, the new name)
 - `action`: `create | modify | archive`
 - `portfolio` (FK → Portfolio, `PROTECT`)
 - `details` (JSONField): create-time metadata such as `description` and `parent_team`
-- `status`: `draft | submitted | approved | rejected` (Phase 2 adds `applied`)
+- `status`: `draft | submitted | approved | rejected | applied`
+- `applied_at`, `applied_diff`: when the change was written into the YAML, and the diff that was made
 - `decided_by` (FK → User, nullable), `decided_at`, `decision_comment`: the approver's decision
 - `created_at`, `submitted_at`
 
@@ -344,7 +345,7 @@ Work through these phases in order. **At the end of each phase: all tests pass, 
 
 ## Phase 2 (not in scope, design with these in mind)
 
-- Generate a branch and PR against `terraform-github` from a submitted `ChangeRequest`, using the stored items to edit YAML while preserving unknown fields.
+- **YAML editing is built**: with `APPLY_APPROVED_CHANGES` on, approving a request writes it into the right `config.yaml` (`catalogue.services.terraform_writer`, round-tripped with `ruamel.yaml` so comments, order and unknown fields survive), sets the status to `applied` and stores the diff. New entries start from `catalogue/config_templates/`. Still to do: generate a branch and PR against `terraform-github` from that edit instead of writing to the working copy.
 - ~~In-app approval by the portfolio approvers~~ **Built**: `/approvals/` lists open and completed requests for the portfolios a user approves (through `Approver.user`), with approve and reject (`approved | rejected` statuses, `decided_by`, `decided_at`, `decision_comment`). Notifications are still to do.
 - Replace the stubbed GitHub usernames with the GitHub API.
 - Detect stale requests where the YAML changed after submission, and warn about multiple pending requests against the same target.

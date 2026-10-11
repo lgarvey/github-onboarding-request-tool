@@ -13,10 +13,11 @@ This project is a Django POC for requesting GitHub repo/team access changes, bac
 - Python 3.13, Django 5.2 LTS, Poetry. Add dependencies with `poetry add`, never by editing the lock file.
 - Server-rendered templates with standard POST/redirect/GET. Vanilla JS is fine for dynamic form rows and UX; no SPA frameworks and no JS build step.
 - Bootstrap 5 is vendored into `static/`, not loaded from a CDN.
-- Views never read YAML directly. Go through `catalogue.services.terraform_config`.
+- Organisations are rows in `catalogue.Organisation` (GitHub name plus config directory), not discovered from the directory tree. Code refers to an organisation by its GitHub name.
+- Views never read or write YAML directly. Read through `catalogue.services.terraform_config`; write through `catalogue.services.terraform_writer`.
 - Permission/role values are defined once as `TextChoices` and reused everywhere.
 - All settings come from env vars via `django-environ`. No secrets in code.
-- The config tree is read from `TERRAFORM_GITHUB_PATH`. The default is `terraform-github-sample/`, a checked-in stand-in holding the schemas and an empty sample org. A real checkout at `terraform-github/` is gitignored. Either way it is **read-only**: the app never writes to it (yet).
+- The config tree is read from `TERRAFORM_GITHUB_PATH`. The default is `terraform-github-sample/`, a checked-in stand-in holding the schemas and an empty sample org. A real checkout at `terraform-github/` is gitignored. The app only reads it, except that with `APPLY_APPROVED_CHANGES` on, approving a request writes the change into it through `catalogue.services.terraform_writer`.
 - Tests use `tests/fixtures/terraform-github/`, never the real checkout.
 
 ## Commands

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
@@ -17,6 +18,7 @@ from change_requests.forms import (
     build_principal_formset,
 )
 from change_requests.models import ChangeRequest
+from change_requests.services import apply as apply_service
 from change_requests.services.diff import diff_permissions
 from change_requests.services.drafts import apply_items, save_draft
 from github_users.services import list_usernames
@@ -355,6 +357,19 @@ def approval_list(request):
     )
 
 
+def _apply_and_report(request, change_request, done_message):
+    """Write an approved request into the YAML, telling the user how it went."""
+    try:
+        apply_service.apply(change_request)
+    except apply_service.ConfigError as error:
+        messages.warning(
+            request,
+            f"{done_message} The YAML was not updated: {error} You can try again from the request.",
+        )
+    else:
+        messages.success(request, f"{done_message} The YAML config has been updated.")
+
+
 @require_http_methods(["GET", "POST"])
 def approval_detail(request, pk):
     change_request = get_object_or_404(_requests_to_approve(request.user), pk=pk)
@@ -373,8 +388,20 @@ def approval_detail(request, pk):
                 approved=form.approved, by=request.user, comment=form.cleaned_data["comment"]
             )
             verb = "approved" if form.approved else "rejected"
-            messages.success(request, f"You {verb} the request: {change_request}.")
+            done_message = f"You {verb} the request: {change_request}."
+            if form.approved and settings.APPLY_APPROVED_CHANGES:
+                _apply_and_report(request, change_request, done_message)
+            else:
+                messages.success(request, done_message)
             return redirect("approval_list")
+
+    # Show what approving would do to the YAML, while that is still undecided.
+    preview_diff = preview_error = None
+    if change_request.is_open or change_request.can_be_applied:
+        try:
+            preview_diff = apply_service.build_edit(change_request).diff()
+        except apply_service.ConfigError as error:
+            preview_error = str(error)
 
     return render(
         request,
@@ -385,5 +412,18 @@ def approval_detail(request, pk):
             "form": form,
             "can_decide": can_decide,
             "is_own": is_own,
+            "preview_diff": preview_diff,
+            "preview_error": preview_error,
+            "can_apply": change_request.can_be_applied and settings.APPLY_APPROVED_CHANGES,
         },
     )
+
+
+@require_POST
+def approval_apply(request, pk):
+    """Retry writing an approved request into the YAML."""
+    change_request = get_object_or_404(_requests_to_approve(request.user), pk=pk)
+    if not settings.APPLY_APPROVED_CHANGES or not change_request.can_be_applied:
+        raise Http404("This request cannot be applied")
+    _apply_and_report(request, change_request, f"Applying {change_request}.")
+    return redirect("approval_detail", change_request.pk)

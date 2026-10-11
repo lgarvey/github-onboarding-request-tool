@@ -13,18 +13,15 @@ SCHEMAS = Path(__file__).parent.parent / "terraform-github-sample" / "schemas"
 
 
 class TestOrganisations:
-    def test_lists_directories_only_sorted(self):
+    def test_lists_managed_organisations_sorted(self):
         assert terraform_config.list_organisations() == ["acme", "bare-org", "empty-org", "legacy"]
 
-    def test_missing_checkout_gives_no_organisations(self, settings, tmp_path):
-        settings.TERRAFORM_GITHUB_PATH = tmp_path / "does-not-exist"
+    @pytest.mark.parametrize("root", ["", "does-not-exist"])
+    def test_missing_checkout_shows_organisations_as_empty(self, settings, tmp_path, root):
+        settings.TERRAFORM_GITHUB_PATH = tmp_path / root
 
-        assert terraform_config.list_organisations() == []
-
-    def test_checkout_without_terraform_directory(self, settings, tmp_path):
-        settings.TERRAFORM_GITHUB_PATH = tmp_path
-
-        assert terraform_config.list_organisations() == []
+        assert terraform_config.list_organisations()[0] == "acme"
+        assert terraform_config.list_directories() == []
         assert terraform_config.get_repositories("acme") == []
 
     def test_uses_fixture_tree_not_real_checkout(self, settings):

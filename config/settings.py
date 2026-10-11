@@ -112,5 +112,9 @@ STORAGES = {
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
+# Write an approved request's change into the YAML config. Off unless asked for, so the
+# app only ever reads a real checkout by default.
+APPLY_APPROVED_CHANGES = env.bool("APPLY_APPROVED_CHANGES", default=False)
+
 # A relative path is resolved against the project root; an absolute one is used as-is.
 TERRAFORM_GITHUB_PATH = BASE_DIR / env("TERRAFORM_GITHUB_PATH", default="terraform-github-sample")
