@@ -22,6 +22,7 @@
       </h2>
       <div id="repositories" class="accordion-collapse collapse">
         <div class="accordion-body">
+          <a class="btn btn-primary mb-3" href="{% url 'repository_create' org %}">Add repository</a>
           {% if repositories %}
             {% include "catalogue/_filter.html" with id="repository-filter" list="repository-list" label="Search repositories" noun="repositories" %}
             <ul class="list-group list-group-filterable mb-3" id="repository-list">
@@ -41,7 +42,6 @@
           {% else %}
             <p class="text-muted">This organisation has no repositories.</p>
           {% endif %}
-          <a class="btn btn-primary" href="{% url 'repository_create' org %}">Add repository</a>
         </div>
       </div>
     </div>
@@ -55,6 +55,7 @@
       </h2>
       <div id="teams" class="accordion-collapse collapse">
         <div class="accordion-body">
+          <a class="btn btn-primary mb-3" href="{% url 'team_create' org %}">Add team</a>
           {% if team_rows %}
             {% include "catalogue/_filter.html" with id="team-filter" list="team-list" label="Search teams" noun="teams" %}
             <ul class="list-group list-group-filterable mb-3" id="team-list">
@@ -72,7 +73,6 @@
           {% else %}
             <p class="text-muted">This organisation has no teams.</p>
           {% endif %}
-          <a class="btn btn-primary" href="{% url 'team_create' org %}">Add team</a>
         </div>
       </div>
     </div>
