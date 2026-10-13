@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ org }}{% endblock %}
 
@@ -22,9 +23,10 @@
       <div id="repositories" class="accordion-collapse collapse">
         <div class="accordion-body">
           {% if repositories %}
-            <ul class="list-group mb-3">
+            {% include "catalogue/_filter.html" with id="repository-filter" list="repository-list" label="Search repositories" noun="repositories" %}
+            <ul class="list-group list-group-filterable mb-3" id="repository-list">
               {% for repo in repositories %}
-                <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-2" data-filter-text="{{ repo.name|lower }}">
                   <span class="me-auto">
                     <span class="fw-semibold">{{ repo.name }}</span>
                     {% if repo.archived %}<span class="badge text-bg-warning ms-1">Archived</span>{% endif %}
@@ -54,9 +56,10 @@
       <div id="teams" class="accordion-collapse collapse">
         <div class="accordion-body">
           {% if team_rows %}
-            <ul class="list-group mb-3">
+            {% include "catalogue/_filter.html" with id="team-filter" list="team-list" label="Search teams" noun="teams" %}
+            <ul class="list-group list-group-filterable mb-3" id="team-list">
               {% for row in team_rows %}
-                <li class="list-group-item d-flex flex-wrap align-items-center gap-2">
+                <li class="list-group-item d-flex flex-wrap align-items-center gap-2" data-filter-text="{{ row.team.name|lower }} {{ row.team.slug|lower }}">
                   <span class="me-auto">
                     <span class="fw-semibold">{{ row.team.name }}</span>
                     <span class="text-muted ms-1">{{ row.team.members|length }} member{{ row.team.members|length|pluralize }}</span>
@@ -74,4 +77,8 @@
       </div>
     </div>
   </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/filter.js' %}"></script>
 {% endblock %}

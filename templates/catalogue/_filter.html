@@ -1,0 +1,6 @@
+{# A search box for a long list, which filter.js also splits into pages. Hidden until it runs. #}
+<div class="mb-3 d-none" data-filter data-filter-list="{{ list }}">
+  <label class="visually-hidden" for="{{ id }}">{{ label }}</label>
+  <input type="search" class="form-control" id="{{ id }}" placeholder="{{ label }}…" autocomplete="off" data-filter-input>
+  <div class="form-text" data-filter-count data-filter-noun="{{ noun }}" aria-live="polite"></div>
+</div>

@@ -95,6 +95,8 @@ A checkout placed at `./terraform-github` is gitignored, so it cannot be committ
 
 - **Organisations** (`/`) lists each organisation. Its page has collapsible Repositories and
   Teams sections.
+- Each section has a **search box** and shows 25 entries a page, so large organisations stay
+  manageable. Search matches any part of a repository name, or a team's name or slug.
 - From there you can **edit a repository's collaborators**, **edit a team's members**,
   **add a repository**, **add a team**, or **archive a repository**.
 - Each form asks for a **portfolio** and leads to a **confirm page** showing a text summary of the

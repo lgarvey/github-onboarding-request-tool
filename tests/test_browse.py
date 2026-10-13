@@ -122,3 +122,21 @@ class TestOrganisationDetail:
         assert "This organisation has no teams." in html
         assert f'href="/orgs/{org}/repos/new/"' in html
         assert f'href="/orgs/{org}/teams/new/"' in html
+
+
+class TestSearchBoxes:
+    def test_each_section_has_a_search_box_over_its_list(self, auth_client):
+        html = auth_client.get("/orgs/acme/").content.decode()
+
+        assert 'data-filter-list="repository-list"' in html
+        assert 'data-filter-list="team-list"' in html
+        assert 'id="repository-list"' in html and 'id="team-list"' in html
+        assert 'data-filter-text="trade-api"' in html
+        # Teams can be found by name or by slug.
+        assert 'data-filter-text="platform sre platform-sre"' in html
+        assert "js/filter.js" in html
+
+    def test_no_search_box_when_there_is_nothing_to_search(self, auth_client):
+        html = auth_client.get("/orgs/empty-org/").content.decode()
+
+        assert "data-filter-list" not in html
