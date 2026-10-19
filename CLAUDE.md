@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This project is a Django POC for requesting GitHub repo/team access changes, backed by the `terraform-github` YAML config. **Read `PLAN.md` first.** It holds the spec and the phased build order.
+This project is a Django POC for requesting GitHub repo/team access changes, backed by the `terraform-github` YAML config. **Read `PLAN.md` first.** It holds the spec and the phased build order. The teams and roles layer extends it in `PLAN-TEAMS.md` (Phases 0a–3 in scope); read that too before working on it.
 
 ## Working agreement
 
