@@ -1,0 +1,14 @@
+applications:
+  - slug: datadog
+    name: Datadog
+    kind: ldap
+  - slug: datahub
+    name: Data Hub
+    kind: oauth
+    permissions: [viewer]
+  - slug: sentry
+    name: Sentry
+    kind: saml
+    permissions: [member]
+    assignments:
+      jane.doe-1@id.example.gov.uk: [owner]

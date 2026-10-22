@@ -1,0 +1,13 @@
+portfolios:
+  - name: Digital Trade
+    teams:
+      - name: Data Science
+        lead: jane.doe@example.gov.uk
+        members: [jane.doe@example.gov.uk, alex.ng@example.gov.uk]
+  - name: Data Services
+    teams:
+      - name: Analytics
+        members:
+          - Pat.Kaur@example.gov.uk
+          - former.member@example.gov.uk   # not in people.yaml: a warning
+  - name: Empty Portfolio

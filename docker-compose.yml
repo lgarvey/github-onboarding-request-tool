@@ -18,14 +18,16 @@ services:
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     env_file: .env
     environment:
-      # TERRAFORM_GITHUB_PATH in .env is the path on the host. Inside the container the
-      # config is always mounted at /terraform-github.
+      # TERRAFORM_GITHUB_PATH and WORLD_PATH in .env are paths on the host. Inside the
+      # container they are always mounted at /terraform-github and (read-only) /world.
       TERRAFORM_GITHUB_PATH: /terraform-github
+      WORLD_PATH: /world
     ports:
       - "8000:8000"
     volumes:
       - .:/app
       - ${TERRAFORM_GITHUB_PATH:-./terraform-github-sample}:/terraform-github
+      - ${WORLD_PATH:-./world-sample}:/world:ro
     depends_on:
       db:
         condition: service_healthy

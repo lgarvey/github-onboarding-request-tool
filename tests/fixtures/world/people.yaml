@@ -1,0 +1,26 @@
+# A small, valid world for tests.
+people:
+  - sso_id: jane.doe-1a2b3c4d@id.example.gov.uk
+    email: Jane.Doe@example.gov.uk
+    first_name: Jane
+    last_name: Doe
+    active: true
+    deactivated_at: null
+    github_login: janedoe
+  - sso_id: sam.minter-5e6f7a8b@id.example.gov.uk
+    email: sam.minter@example.gov.uk
+    first_name: Sam
+    last_name: Minter
+    active: false
+    deactivated_at: 2026-05-01
+    github_login: sminter
+  - sso_id: alex.ng-9c0d1e2f@id.example.gov.uk
+    email: alex.ng@example.gov.uk
+    first_name: Alex
+    last_name: Ng
+    github_login: null
+  - sso_id: pat.kaur-3a4b5c6d@id.example.gov.uk
+    email: pat.kaur@example.gov.uk
+    first_name: Pat
+    last_name: Kaur
+    github_login: PatK

@@ -91,6 +91,35 @@ docker compose up -d
 
 A checkout placed at `./terraform-github` is gitignored, so it cannot be committed by accident.
 
+## The world directory
+
+The teams and roles work (`PLAN-TEAMS.md`) also reads snapshots of the systems around GitHub. It
+reads them from YAML under `WORLD_PATH`, and only ever reads them. The files are `people.yaml`
+(Staff SSO people and their GitHub logins), `intranet.yaml` (portfolios and teams),
+`sso_apps.yaml` (SSO applications and who holds what) and `exclusions.yaml` (bots and break-glass
+accounts that automation never touches). Each reader's docstring in `world/services/` shows its
+format. A missing file counts as empty.
+
+`WORLD_PATH` defaults to `./world-sample`, a synthetic department checked into this repo. It goes
+with the terraform tree in `./terraform-github-demo`, which has two organisations, 60 repositories,
+30 teams and a deliberate set of problems for the reports to find (listed in `world/demo.py`). To
+use them together:
+
+```bash
+# .env
+TERRAFORM_GITHUB_PATH=./terraform-github-demo
+WORLD_PATH=./world-sample
+```
+
+```bash
+docker compose exec web python manage.py import_organisations
+docker compose exec web python manage.py validate_world        # file:line for every problem
+docker compose exec web python manage.py generate_demo_world   # rebuild both demo trees
+```
+
+`generate_demo_world` writes the same output every run, and only overwrites directories it wrote
+itself. A real snapshot goes in `./world-live`, which is gitignored.
+
 ## Using it
 
 - **Organisations** (`/`) lists each organisation. Its page has collapsible Repositories and

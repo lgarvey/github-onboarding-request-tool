@@ -222,6 +222,7 @@ __marimo__/
 # Project
 /staticfiles/
 /terraform-github/
+/world-live/
 
 # Demo recording output
 /demo/output/

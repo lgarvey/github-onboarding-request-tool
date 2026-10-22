@@ -17,10 +17,11 @@ def get_team_ids(org: str) -> dict[str, int]:
     replaced by a GitHub GraphQL query (`organization.teams { slug databaseId }`) using a
     token with access to every organisation. Callers depend only on this function.
     """
-    return {team.slug: _fake_team_id(org, team.slug) for team in terraform_config.get_teams(org)}
+    return {team.slug: stub_team_id(org, team.slug) for team in terraform_config.get_teams(org)}
 
 
-def _fake_team_id(org: str, slug: str) -> int:
+def stub_team_id(org: str, slug: str) -> int:
+    """The fake ID the stub gives a team. Generated demo config uses it for `parent_team_id`."""
     return zlib.crc32(f"{org}/{slug}".encode()) % 9_000_000 + 1_000_000
 
 

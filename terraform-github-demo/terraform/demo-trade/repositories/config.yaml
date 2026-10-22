@@ -1,0 +1,405 @@
+---
+demo-trade:
+  slug: demo-trade
+  repositories:
+    ds-notebooks:
+      name: ds-notebooks
+      description: 'Data Science: notebooks'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: push
+        data-sci-admins: admin
+      user_permissions: {}
+    ds-models:
+      name: ds-models
+      description: 'Data Science: models'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: push
+        data-sci-admins: admin
+      user_permissions: {}
+    ds-feature-store:
+      name: ds-feature-store
+      description: 'Data Science: feature store'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: push
+        data-sci-admins: admin
+      user_permissions: {}
+    ds-experiments:
+      name: ds-experiments
+      description: 'Data Science: experiments'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: push
+        data-sci-admins: admin
+      user_permissions: {}
+    ds-dashboards:
+      name: ds-dashboards
+      description: 'Data Science: dashboards'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: push
+        data-sci-admins: admin
+      user_permissions: {}
+    trade-api:
+      name: trade-api
+      description: 'Trade Platform: api'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions:
+        nvega: push
+    trade-web:
+      name: trade-web
+      description: 'Trade Platform: web'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions: {}
+    trade-frontend-components:
+      name: trade-frontend-components
+      description: 'Trade Platform: frontend components'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+        trade-platform-frontend: push
+      user_permissions: {}
+    trade-search:
+      name: trade-search
+      description: 'Trade Platform: search'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions: {}
+    trade-notifications:
+      name: trade-notifications
+      description: 'Trade Platform: notifications'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions: {}
+    trade-auth:
+      name: trade-auth
+      description: 'Trade Platform: auth'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions: {}
+    trade-infra:
+      name: trade-infra
+      description: 'Trade Platform: infra'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        trade-platform: push
+        trade-platform-admins: admin
+      user_permissions: {}
+    export-portal:
+      name: export-portal
+      description: 'Export Services: portal'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+      user_permissions: {}
+    export-api:
+      name: export-api
+      description: 'Export Services: api'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+      user_permissions: {}
+    export-docs:
+      name: export-docs
+      description: 'Export Services: docs'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+      user_permissions: {}
+    export-forms:
+      name: export-forms
+      description: 'Export Services: forms'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+      user_permissions: {}
+    export-data-sync:
+      name: export-data-sync
+      description: 'Export Services: data sync'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+      user_permissions: {}
+    finance-ledger:
+      name: finance-ledger
+      description: 'Finance Systems: ledger'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        finance-systems: push
+        finance-systems-admins: admin
+      user_permissions:
+        olewis: pull
+    finance-reports:
+      name: finance-reports
+      description: 'Finance Systems: reports'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        finance-systems: push
+        finance-systems-admins: admin
+      user_permissions: {}
+    finance-payroll-bridge:
+      name: finance-payroll-bridge
+      description: 'Finance Systems: payroll bridge'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        finance-systems: push
+        finance-systems-admins: admin
+      user_permissions: {}
+    finance-api:
+      name: finance-api
+      description: 'Finance Systems: api'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        finance-systems: push
+        finance-systems-admins: admin
+      user_permissions: {}
+    finance-etl:
+      name: finance-etl
+      description: 'Finance Systems: etl'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        finance-systems: push
+        finance-systems-admins: admin
+      user_permissions: {}
+    hr-portal:
+      name: hr-portal
+      description: 'HR Systems: portal'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        hr-systems: maintain
+      user_permissions: {}
+    hr-onboarding:
+      name: hr-onboarding
+      description: 'HR Systems: onboarding'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        hr-systems: maintain
+      user_permissions: {}
+    hr-leave:
+      name: hr-leave
+      description: 'HR Systems: leave'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        hr-systems: maintain
+      user_permissions: {}
+    hr-directory:
+      name: hr-directory
+      description: 'HR Systems: directory'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        hr-systems: maintain
+      user_permissions: {}
+    platform-terraform:
+      name: platform-terraform
+      description: 'SRE: terraform'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    platform-monitoring:
+      name: platform-monitoring
+      description: 'SRE: monitoring'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    platform-runbooks:
+      name: platform-runbooks
+      description: 'SRE: runbooks'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    platform-ci:
+      name: platform-ci
+      description: 'SRE: ci'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    platform-dns:
+      name: platform-dns
+      description: 'SRE: dns'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    .github:
+      name: .github
+      description: 'SRE: .github'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    legacy-trade-tool:
+      name: legacy-trade-tool
+      description: 'Legacy: trade tool'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        legacy-reporting: push
+      user_permissions: {}
+    shared-design-system:
+      name: shared-design-system
+      description: 'Shared: design system'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-services: maintain
+        trade-platform: maintain
+      user_permissions: {}

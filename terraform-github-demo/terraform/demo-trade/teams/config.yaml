@@ -1,0 +1,190 @@
+---
+demo-trade:
+  slug: demo-trade
+  display_name: Demo Trade
+  billing_email: github-billing@example.gov.uk
+  description: Demo Trade (synthetic demo organisation)
+  admin_logins:
+  - breakglass-admin
+  - vchen
+  teams:
+    data-sci:
+      name: Data Sci
+      slug: data-sci
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        adoyle: maintainer
+        awalsh: member
+        fdoyle: member
+        jbrooks: member
+        kquinn: member
+        ljones: member
+        mlewis: member
+        nshah: member
+        ubrooks: member
+        yadebayo: member
+    data-sci-admins:
+      name: Data Sci Admins
+      slug: data-sci-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        adoyle: maintainer
+        nshah: maintainer
+    trade-platform:
+      name: Trade Platform
+      slug: trade-platform
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        afischer: member
+        bevans: maintainer
+        dfischer: member
+        fvega: member
+        mnovak: member
+        ovega: member
+        sshah: member
+        ygill: member
+    trade-platform-admins:
+      name: Trade Platform Admins
+      slug: trade-platform-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        bevans: maintainer
+        ovega: maintainer
+    trade-platform-frontend:
+      name: Trade Platform Frontend
+      slug: trade-platform-frontend
+      description: null
+      privacy: closed
+      parent_team_id: 9596042
+      members:
+        afischer: member
+        fvega: maintainer
+        ygill: member
+    export-services:
+      name: Export Services
+      slug: export-services
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        dhughes: member
+        diqbal: member
+        lnovak: maintainer
+        nlewis: member
+        qkhan: member
+        yreid: member
+    finance-systems:
+      name: Finance Systems
+      slug: finance-systems
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        ahughes: member
+        dkhan: member
+        hyoung: member
+        jturner: member
+        kturner: maintainer
+        qpatel: member
+        revans: member
+        tgill: member
+    finance-systems-admins:
+      name: Finance Systems Admins
+      slug: finance-systems-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        jturner: maintainer
+        kturner: maintainer
+    hr-systems:
+      name: HR Systems
+      slug: hr-systems
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        ausman: member
+        diqbal2: member
+        olewis: maintainer
+        ypatel: member
+    sre:
+      name: SRE
+      slug: sre
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        cbrooks: member
+        cyoung: member
+        demo-ci-bot: member
+        jdoyle: member
+        kdoyle: member
+        nevans: member
+        qbrooks: member
+        uadebayo: member
+        vchen: maintainer
+    sre-admins:
+      name: SRE Admins
+      slug: sre-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        uadebayo: maintainer
+        vchen: maintainer
+    cyber:
+      name: Cyber
+      slug: cyber
+      description: Read access to every repository
+      privacy: closed
+      parent_team_id: null
+      members:
+        aevans: member
+        afischer2: maintainer
+        bshah: member
+        kgill: member
+        kkhan: member
+        qmorgan: member
+    architects:
+      name: Architects
+      slug: architects
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        enovak: member
+        eturner: maintainer
+        kvega: member
+        nmorgan: member
+        rgill: member
+        wlewis: member
+      organisation_role_names:
+      - all_repo_read
+    old-migration:
+      name: Old Migration
+      slug: old-migration
+      description: 2024 platform migration
+      privacy: closed
+      parent_team_id: null
+      members:
+        mnovak: maintainer
+        sshah: member
+    legacy-reporting:
+      name: Legacy Reporting
+      slug: legacy-reporting
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        ahughes: member
+        dfischer: maintainer
+        hadebayo: member

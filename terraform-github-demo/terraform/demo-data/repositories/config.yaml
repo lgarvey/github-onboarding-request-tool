@@ -1,0 +1,313 @@
+---
+demo-data:
+  slug: demo-data
+  repositories:
+    de-pipelines:
+      name: de-pipelines
+      description: 'Data Engineering: pipelines'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions:
+        ext-contractor-jq: push
+    de-airflow:
+      name: de-airflow
+      description: 'Data Engineering: airflow'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    de-dbt-models:
+      name: de-dbt-models
+      description: 'Data Engineering: dbt models'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    de-ingest:
+      name: de-ingest
+      description: 'Data Engineering: ingest'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    de-quality:
+      name: de-quality
+      description: 'Data Engineering: quality'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    de-schemas:
+      name: de-schemas
+      description: 'Data Engineering: schemas'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    data-catalogue:
+      name: data-catalogue
+      description: 'Data Engineering: catalogue'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-engineering: push
+        data-engineering-admins: admin
+      user_permissions: {}
+    infra-warehouse:
+      name: infra-warehouse
+      description: 'Data Infrastructure: warehouse'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-infra: push
+        data-infra-admins: admin
+      user_permissions:
+        hadebayo: maintain
+    infra-lake:
+      name: infra-lake
+      description: 'Data Infrastructure: lake'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-infra: push
+        data-infra-admins: admin
+      user_permissions: {}
+    infra-terraform:
+      name: infra-terraform
+      description: 'Data Infrastructure: terraform'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-infra: push
+        data-infra-admins: admin
+      user_permissions: {}
+    infra-access:
+      name: infra-access
+      description: 'Data Infrastructure: access'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-infra: push
+        data-infra-admins: admin
+      user_permissions: {}
+    infra-backups:
+      name: infra-backups
+      description: 'Data Infrastructure: backups'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-infra: push
+        data-infra-admins: admin
+      user_permissions: {}
+    analytics-reports:
+      name: analytics-reports
+      description: 'Analytics: reports'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        analytics: push
+        analytics-admins: admin
+        cyber: pull
+        reporting-guild: push
+      user_permissions: {}
+    analytics-tableau:
+      name: analytics-tableau
+      description: 'Analytics: tableau'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        analytics: push
+        analytics-admins: admin
+        cyber: pull
+      user_permissions: {}
+    analytics-metrics:
+      name: analytics-metrics
+      description: 'Analytics: metrics'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        analytics: push
+        analytics-admins: admin
+        cyber: pull
+      user_permissions: {}
+    analytics-sql:
+      name: analytics-sql
+      description: 'Analytics: sql'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        analytics: push
+        analytics-admins: admin
+        cyber: pull
+      user_permissions: {}
+    analytics-notebooks:
+      name: analytics-notebooks
+      description: 'Analytics: notebooks'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        analytics: push
+        analytics-admins: admin
+        cyber: pull
+      user_permissions: {}
+    ml-training:
+      name: ml-training
+      description: 'Data Science: training'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: maintain
+      user_permissions: {}
+    ml-serving:
+      name: ml-serving
+      description: 'Data Science: serving'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: maintain
+      user_permissions: {}
+    ml-research-papers:
+      name: ml-research-papers
+      description: 'Data Science: research papers'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: maintain
+        ml-research: push
+      user_permissions: {}
+    ml-datasets:
+      name: ml-datasets
+      description: 'Data Science: datasets'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        data-sci: maintain
+      user_permissions: {}
+    export-stats:
+      name: export-stats
+      description: 'Export Services: stats'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-data: maintain
+      user_permissions: {}
+    export-feeds:
+      name: export-feeds
+      description: 'Export Services: feeds'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        export-data: maintain
+      user_permissions: {}
+    data-platform-monitoring:
+      name: data-platform-monitoring
+      description: 'SRE: platform monitoring'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    data-platform-ci:
+      name: data-platform-ci
+      description: 'SRE: platform ci'
+      visibility: private
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        sre: push
+        sre-admins: admin
+      user_permissions: {}
+    old-data-scripts:
+      name: old-data-scripts
+      description: 'Legacy: data scripts'
+      visibility: internal
+      archived: false
+      has_issues: true
+      delete_branch_on_merge: true
+      team_permissions:
+        cyber: pull
+        reporting-guild: push
+      user_permissions: {}

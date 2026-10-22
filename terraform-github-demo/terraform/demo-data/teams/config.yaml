@@ -1,0 +1,191 @@
+---
+demo-data:
+  slug: demo-data
+  display_name: Demo Data
+  billing_email: github-billing@example.gov.uk
+  description: Demo Data (synthetic demo organisation)
+  admin_logins:
+  - breakglass-admin
+  - vchen
+  teams:
+    data-engineering:
+      name: Data Engineering
+      slug: data-engineering
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        aadebayo: member
+        blewis: maintainer
+        bokafor: member
+        hadebayo: member
+        pchen: member
+        qpatel: member
+        zvega: member
+    data-engineering-admins:
+      name: Data Engineering Admins
+      slug: data-engineering-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        blewis: maintainer
+        bokafor: maintainer
+    data-infra:
+      name: Data Infra
+      slug: data-infra
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        evega: member
+        liqbal: member
+        mwalsh: member
+        uusman: maintainer
+        yfischer: member
+        zquinn: member
+    data-infra-admins:
+      name: Data Infra Admins
+      slug: data-infra-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        uusman: maintainer
+        zquinn: maintainer
+    analytics:
+      name: Analytics
+      slug: analytics
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        awalsh: member
+        dadebayo: member
+        eokafor: member
+        ext-contractor-jq: member
+        kquinn: member
+        nvega: maintainer
+    analytics-admins:
+      name: Analytics Admins
+      slug: analytics-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        kquinn: maintainer
+        nvega: maintainer
+    data-sci:
+      name: Data Sci
+      slug: data-sci
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        adoyle: maintainer
+        fdoyle: member
+        jbrooks: member
+        ljones: member
+        mlewis: member
+        nshah: member
+        ubrooks: member
+        yadebayo: member
+    ml-research:
+      name: ML Research
+      slug: ml-research
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        fdoyle: maintainer
+        jbrooks: member
+        ubrooks: member
+        yadebayo: member
+    export-data:
+      name: Export Data
+      slug: export-data
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        dhughes: member
+        diqbal: member
+        lnovak: maintainer
+        nlewis: member
+        qkhan: member
+        yreid: member
+    sre:
+      name: SRE
+      slug: sre
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        cbrooks: member
+        cyoung: member
+        demo-ci-bot: member
+        jdoyle: member
+        kdoyle: member
+        nevans: member
+        qbrooks: member
+        uadebayo: member
+        vchen: maintainer
+    sre-admins:
+      name: SRE Admins
+      slug: sre-admins
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        uadebayo: maintainer
+        vchen: maintainer
+    cyber:
+      name: Cyber
+      slug: cyber
+      description: Read access to every repository
+      privacy: closed
+      parent_team_id: null
+      members:
+        aevans: member
+        afischer2: maintainer
+        bshah: member
+        kgill: member
+        kkhan: member
+        qmorgan: member
+    architects:
+      name: Architects
+      slug: architects
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        enovak: member
+        eturner: maintainer
+        kvega: member
+        nmorgan: member
+        rgill: member
+        wlewis: member
+      organisation_role_names:
+      - all_repo_read
+    hackathon-2023:
+      name: Hackathon 2023
+      slug: hackathon-2023
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        eokafor: member
+        ovega: maintainer
+        ubrooks: member
+        zvega: member
+    reporting-guild:
+      name: Reporting Guild
+      slug: reporting-guild
+      description: null
+      privacy: closed
+      parent_team_id: null
+      members:
+        dadebayo: member
+        dkhan: member
+        eokafor: maintainer
+        yadebayo: member
