@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "portfolios",
     "change_requests",
     "github_users",
+    "world",
 ]
 
 MIDDLEWARE = [
@@ -118,3 +119,7 @@ APPLY_APPROVED_CHANGES = env.bool("APPLY_APPROVED_CHANGES", default=False)
 
 # A relative path is resolved against the project root; an absolute one is used as-is.
 TERRAFORM_GITHUB_PATH = BASE_DIR / env("TERRAFORM_GITHUB_PATH", default="terraform-github-sample")
+
+# Snapshots of the systems around GitHub (Staff SSO people and apps, the intranet's teams),
+# as YAML. Only ever read. Resolved like TERRAFORM_GITHUB_PATH.
+WORLD_PATH = BASE_DIR / env("WORLD_PATH", default="world-sample")

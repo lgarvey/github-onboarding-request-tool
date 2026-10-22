@@ -1,0 +1,10 @@
+portfolios:
+  - teams: []
+  - name: Digital Trade
+    teams:
+      - name: Data Science
+        members: [jane.doe@example.gov.uk, jane]
+  - name: Data Services
+    teams:
+      - name: data science
+teams: []

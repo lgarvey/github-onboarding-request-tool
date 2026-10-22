@@ -1,0 +1,64 @@
+---
+$schema: https://yaml-schema.net/yaml-schema.yaml
+$id: https://yaml-schema.net/draft/2025-11/meta-schema
+title: Terraform team schema
+description: Schema for validating the config.yaml file in the "teams" resource directories.
+type: object
+patternProperties:
+  ^[a-zA-Z][a-zA-Z0-9_-]*$:
+    type: object
+    properties:
+      slug:
+        type: string
+      display_name:
+        type: string
+      billing_email:
+        type: string
+      description:
+        oneOf:
+          - type: string
+          - type: null
+      admin_logins:
+        type: array
+        prefixItems:
+          - type: string
+      teams:
+        type: object
+        patternProperties:
+          ^[.a-zA-Z][a-zA-Z0-9_-]*$:
+            type: object
+            properties:
+              name:
+                type: string
+              slug:
+                type: string
+              description:
+                oneOf:
+                  - type: string
+                  - type: null
+              privacy:
+                type: string
+                pattern: (closed|secret)
+              parent_team_id:
+                oneOf:
+                  - type: null
+                  - type: integer
+              members:
+                type: object
+                patternProperties:
+                  ^[a-zA-Z][a-zA-Z0-9_-]*$:
+                    type: string
+                    pattern: (maintainer|member)
+              organisation_role_names:
+                type: array
+                prefixItems:
+                  - enum:
+                      - all_repo_admin
+                      - all_repo_maintain
+                      - all_repo_read
+                      - all_repo_triage
+                      - all_repo_write
+                      - app_manager
+                      - ci_cd_admin
+                      - copilot_metrics
+                      - security_manager

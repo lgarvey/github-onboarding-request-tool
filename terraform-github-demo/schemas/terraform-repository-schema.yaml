@@ -1,0 +1,118 @@
+---
+$schema: https://yaml-schema.net/yaml-schema.yaml
+$id: https://yaml-schema.net/draft/2025-11/meta-schema
+title: Terraform repository schema
+description: Schema for validating the config.yaml file in the "repositories" resource
+  directories.
+type: object
+patternProperties:
+  ^[a-zA-Z][a-zA-Z0-9_-]*$:
+    type: object
+    properties:
+      slug:
+        type: string
+      repositories:
+        type: object
+        patternProperties:
+          ^[.a-zA-Z][a-zA-Z0-9_-]*$:
+            type: object
+            properties:
+              allow_auto_merge:
+                type: boolean
+              allow_merge_commit:
+                type: boolean
+              allow_rebase_merge:
+                type: boolean
+              allow_squash_merge:
+                type: boolean
+              allow_update_branch:
+                type: boolean
+              archived:
+                type: boolean
+              delete_branch_on_merge:
+                type: boolean
+              description:
+                oneOf:
+                  - type: string
+                  - type: null
+              fork:
+                type: boolean
+              has_discussions:
+                type: boolean
+              has_downloads:
+                type: boolean
+              has_issues:
+                type: boolean
+              has_pages:
+                type: boolean
+              has_projects:
+                type: boolean
+              has_wiki:
+                type: boolean
+              homepage_url:
+                oneOf:
+                  - type: string
+                  - type: null
+              is_template:
+                type: boolean
+              merge_commit_message:
+                type: string
+                pattern: (PR_BODY|PR_TITLE|BLANK)
+              merge_commit_title:
+                type: string
+                pattern: (PR_TITLE|MERGE_MESSAGE)
+              name:
+                type: string
+                pattern: ^[.a-zA-Z][a-zA-Z0-9_-]*$
+              source_owner:
+                oneOf:
+                  - type: string
+                  - type: null
+              source_repo:
+                oneOf:
+                  - type: string
+                  - type: null
+              squash_merge_commit_message:
+                type: string
+                pattern: (PR_BODY|COMMIT_MESSAGES|BLANK)
+              squash_merge_commit_title:
+                type: string
+                pattern: (PR_TITLE|COMMIT_OR_PR_TITLE)
+              visibility:
+                type: string
+                pattern: (public|private|internal)
+              team_permissions:
+                type: object
+                patternProperties:
+                  ^[a-zA-Z][a-zA-Z0-9_-]*$:
+                    type: string
+                    pattern: ^(triage|pull|push|maintain|admin)$
+              user_permissions:
+                oneOf:
+                  - type: null
+                  - type: object
+                patternProperties:
+                  ^[a-zA-Z][a-zA-Z0-9_-]*$:
+                    type: string
+                    pattern: (triage|pull|push|maintain|admin)
+              template:
+                oneOf:
+                  - type: string
+                  - type: null
+              pages_build_type:
+                oneOf:
+                  - type: string
+                  - type: null
+                pattern: (legacy|workflow)
+              pages_cname:
+                oneOf:
+                  - type: string
+                  - type: null
+              pages_source_branch:
+                oneOf:
+                  - type: string
+                  - type: null
+              pages_source_path:
+                oneOf:
+                  - type: string
+                  - type: null

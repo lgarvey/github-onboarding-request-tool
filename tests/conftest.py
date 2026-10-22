@@ -7,12 +7,14 @@ from catalogue.models import Organisation
 from tests.factories import UserFactory
 
 FIXTURE_TERRAFORM_GITHUB = Path(__file__).parent / "fixtures" / "terraform-github"
+FIXTURE_WORLD = Path(__file__).parent / "fixtures" / "world"
 
 
 @pytest.fixture(autouse=True)
 def _test_settings(settings):
     # Tests never read the real checkout, and don't need a collectstatic manifest.
     settings.TERRAFORM_GITHUB_PATH = FIXTURE_TERRAFORM_GITHUB
+    settings.WORLD_PATH = FIXTURE_WORLD
     # A developer's .env usually turns SSO off; tests start from the real default.
     settings.DISABLE_SSO = False
     settings.APPLY_APPROVED_CHANGES = False

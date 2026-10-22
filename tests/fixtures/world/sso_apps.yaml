@@ -1,0 +1,15 @@
+applications:
+  - slug: datadog
+    name: Datadog
+    kind: saml
+    permissions: [team-datascience, platform-engineer]
+    assignments:
+      jane.doe-1a2b3c4d@id.example.gov.uk: [team-datascience]
+      pat.kaur-3a4b5c6d@id.example.gov.uk: [team-datascience, platform-engineer]
+  - slug: datahub
+    name: Data Hub
+    kind: oauth
+    permissions: []
+    assignments:
+      alex.ng-9c0d1e2f@id.example.gov.uk: []
+      someone.gone-00000000@id.example.gov.uk: []   # not in people.yaml: a warning
